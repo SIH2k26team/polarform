@@ -24,7 +24,7 @@ export const HomePage = ({
       {/* Hero Section */}
       <section className="relative bg-gradient-to-b from-blue-900 via-sky-900 to-slate-900 text-white pt-16 pb-20 px-4 sm:px-6 overflow-hidden rounded-b-2xl shadow-md">
         {/* Polar backdrop visual effect */}
-        <div 
+        <div
           className="absolute inset-0 opacity-25 mix-blend-overlay bg-cover bg-center pointer-events-none"
           style={{
             backgroundImage: `url('https://images.unsplash.com/photo-1517411032315-54ef2cb783bb?auto=format&fit=crop&w=1600&q=80')`
@@ -32,11 +32,6 @@ export const HomePage = ({
         ></div>
 
         <div className="relative max-w-4xl mx-auto text-center space-y-6">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/20 border border-blue-400/30 text-blue-200 text-xs font-medium backdrop-blur-xs">
-            <span className="w-2 h-2 rounded-full bg-cyan-400"></span>
-            National Centre for Polar and Ocean Research (NCPOR) Portal
-          </div>
-
           <h1 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-white leading-tight">
             PolarSetu
           </h1>
@@ -89,15 +84,15 @@ export const HomePage = ({
       <section className="max-w-7xl mx-auto px-4 sm:px-6 -mt-8 relative z-10">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* Card 1: Discover */}
-          <div 
+          <div
             onClick={() => onNavigate('explore')}
-            className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm hover:shadow-md hover:border-blue-300 transition-all cursor-pointer group flex items-start gap-4"
+            className="bg-white p-6 rounded-xl border border-slate-200 transition-all cursor-pointer group flex items-start gap-4"
           >
-            <div className="w-12 h-12 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0 group-hover:bg-blue-600 group-hover:text-white transition-colors">
+            <div className="w-12 h-12 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
               <Icon name="search" size={24} />
             </div>
             <div>
-              <h3 className="font-bold text-slate-900 text-base mb-1 group-hover:text-blue-600 transition-colors">
+              <h3 className="font-bold text-slate-900 text-base mb-1 transition-colors">
                 Discover
               </h3>
               <p className="text-slate-600 text-xs leading-relaxed">
@@ -110,18 +105,18 @@ export const HomePage = ({
           </div>
 
           {/* Card 2: Learn */}
-          <div 
+          <div
             onClick={() => {
               const explainerRec = records.find(r => r.id === 'rec-001') || publishedRecords[0];
               onOpenStudentView(explainerRec);
             }}
-            className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm hover:shadow-md hover:border-teal-300 transition-all cursor-pointer group flex items-start gap-4"
+            className="bg-white p-6 rounded-xl border border-slate-200 transition-all cursor-pointer group flex items-start gap-4"
           >
-            <div className="w-12 h-12 rounded-xl bg-teal-50 text-teal-600 flex items-center justify-center shrink-0 group-hover:bg-teal-600 group-hover:text-white transition-colors">
+            <div className="w-12 h-12 rounded-xl bg-teal-50 text-teal-600 flex items-center justify-center shrink-0  transition-colors">
               <Icon name="book-open" size={24} />
             </div>
             <div>
-              <h3 className="font-bold text-slate-900 text-base mb-1 group-hover:text-teal-600 transition-colors">
+              <h3 className="font-bold text-slate-900 text-base mb-1 transition-colors">
                 Learn
               </h3>
               <p className="text-slate-600 text-xs leading-relaxed">
@@ -134,18 +129,18 @@ export const HomePage = ({
           </div>
 
           {/* Card 3: Share */}
-          <div 
+          <div
             onClick={() => {
               const shareRec = records.find(r => r.id === 'rec-003') || publishedRecords[0];
               onOpenOutreach(shareRec);
             }}
-            className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm hover:shadow-md hover:border-purple-300 transition-all cursor-pointer group flex items-start gap-4"
+            className="bg-white p-6 rounded-xl border border-slate-200 transition-all cursor-pointer group flex items-start gap-4"
           >
-            <div className="w-12 h-12 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center shrink-0 group-hover:bg-purple-600 group-hover:text-white transition-colors">
+            <div className="w-12 h-12 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center shrink-0 transition-colors">
               <Icon name="share" size={24} />
             </div>
             <div>
-              <h3 className="font-bold text-slate-900 text-base mb-1 group-hover:text-purple-600 transition-colors">
+              <h3 className="font-bold text-slate-900 text-base mb-1 transition-colors">
                 Share
               </h3>
               <p className="text-slate-600 text-xs leading-relaxed">
@@ -159,60 +154,6 @@ export const HomePage = ({
         </div>
       </section>
 
-      {/* Knowledge Linking & Problem-Solution Highlight */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6">
-        <div className="bg-slate-100 rounded-xl p-6 border border-slate-200/80">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
-            <div className="space-y-3">
-              <div className="inline-flex items-center gap-1.5 text-xs font-semibold text-blue-700 uppercase tracking-wide">
-                <Icon name="layers" size={14} />
-                Knowledge Graph Architecture
-              </div>
-              <h2 className="text-xl font-bold text-slate-900">
-                Bridging India's Scattered Polar Science Records
-              </h2>
-              <p className="text-xs text-slate-600 leading-relaxed">
-                Previously, datasets lived in NPDC, reports sat in digital libraries, and social updates were posted manually. 
-                <strong> PolarSetu connects all pieces together:</strong>
-              </p>
-              <div className="flex flex-wrap items-center gap-2 text-xs font-medium text-slate-700 pt-1">
-                <span className="bg-white px-2.5 py-1 rounded border border-slate-200">Expedition</span>
-                <span className="text-slate-400">↔</span>
-                <span className="bg-white px-2.5 py-1 rounded border border-slate-200">Scientists</span>
-                <span className="text-slate-400">↔</span>
-                <span className="bg-white px-2.5 py-1 rounded border border-slate-200">Reports</span>
-                <span className="text-slate-400">↔</span>
-                <span className="bg-white px-2.5 py-1 rounded border border-slate-200">Datasets</span>
-                <span className="text-slate-400">↔</span>
-                <span className="bg-white px-2.5 py-1 rounded border border-slate-200">Photos & Videos</span>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div className="bg-white p-4 rounded-lg border border-slate-200">
-                <div className="text-2xl font-bold text-blue-600">42+</div>
-                <div className="text-xs font-medium text-slate-800">Antarctic Expeditions</div>
-                <div className="text-[11px] text-slate-500">From 1st ISEA (1981) to 42nd</div>
-              </div>
-              <div className="bg-white p-4 rounded-lg border border-slate-200">
-                <div className="text-2xl font-bold text-cyan-600">4 Stations</div>
-                <div className="text-xs font-medium text-slate-800">Polar & Cryo Bases</div>
-                <div className="text-[11px] text-slate-500">Bharati, Maitri, Himadri, Himansh</div>
-              </div>
-              <div className="bg-white p-4 rounded-lg border border-slate-200">
-                <div className="text-2xl font-bold text-indigo-600">100%</div>
-                <div className="text-xs font-medium text-slate-800">Human Review Gate</div>
-                <div className="text-[11px] text-slate-500">AI outputs never auto-published</div>
-              </div>
-              <div className="bg-white p-4 rounded-lg border border-slate-200">
-                <div className="text-2xl font-bold text-teal-600">Crossref</div>
-                <div className="text-xs font-medium text-slate-800">Public API Connected</div>
-                <div className="text-[11px] text-slate-500">Real DOI citation metadata</div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
 
       {/* Featured Verified Research Records */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 space-y-4">
@@ -304,63 +245,6 @@ export const HomePage = ({
               </div>
             </div>
           ))}
-        </div>
-      </section>
-
-      {/* Human Review Gate Architecture Visual (Safety First) */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6">
-        <div className="bg-white rounded-xl p-6 border border-slate-200">
-          <div className="flex items-center gap-2 mb-4">
-            <span className="w-8 h-8 rounded-lg bg-amber-100 text-amber-700 flex items-center justify-center font-bold text-xs">
-              <Icon name="shield-check" size={18} />
-            </span>
-            <div>
-              <h3 className="font-bold text-sm text-slate-900">How PolarSetu Protects Scientific Accuracy</h3>
-              <p className="text-xs text-slate-500">AI drafts suggestions, but a human must approve before publishing</p>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 text-xs">
-            <div className="p-3.5 bg-slate-50 rounded-lg border border-slate-200 space-y-1">
-              <div className="font-bold text-slate-800 flex items-center gap-1.5">
-                <span className="w-4 h-4 rounded-full bg-blue-600 text-white flex items-center justify-center text-[10px]">1</span>
-                Upload & Extract
-              </div>
-              <p className="text-slate-500 text-[11px]">
-                Researcher uploads PDF report, dataset link, or photos with basic coordinates.
-              </p>
-            </div>
-
-            <div className="p-3.5 bg-blue-50/50 rounded-lg border border-blue-200/60 space-y-1">
-              <div className="font-bold text-blue-900 flex items-center gap-1.5">
-                <span className="w-4 h-4 rounded-full bg-blue-600 text-white flex items-center justify-center text-[10px]">2</span>
-                AI Suggests Draft
-              </div>
-              <p className="text-slate-600 text-[11px]">
-                AI suggests tags, plain-language student summary, and social caption pack.
-              </p>
-            </div>
-
-            <div className="p-3.5 bg-amber-50 rounded-lg border border-amber-200 space-y-1">
-              <div className="font-bold text-amber-900 flex items-center gap-1.5">
-                <span className="w-4 h-4 rounded-full bg-amber-600 text-white flex items-center justify-center text-[10px]">3</span>
-                Human Review Gate
-              </div>
-              <p className="text-amber-800 text-[11px]">
-                Reviewer verifies accuracy, edits draft, and signs off with audit timestamp.
-              </p>
-            </div>
-
-            <div className="p-3.5 bg-emerald-50 rounded-lg border border-emerald-200 space-y-1">
-              <div className="font-bold text-emerald-900 flex items-center gap-1.5">
-                <span className="w-4 h-4 rounded-full bg-emerald-600 text-white flex items-center justify-center text-[10px]">4</span>
-                Unified Publishing
-              </div>
-              <p className="text-emerald-800 text-[11px]">
-                Record goes live in Search, Student Explainer, and Outreach Studio.
-              </p>
-            </div>
-          </div>
         </div>
       </section>
     </div>

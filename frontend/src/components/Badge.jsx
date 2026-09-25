@@ -42,35 +42,33 @@ export const ContentTypeBadge = ({ type, className = "" }) => {
       return (
         <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-blue-50 text-blue-700 border border-blue-200 ${className}`}>
           <Icon name="database" size={12} />
-          Dataset
         </span>
       );
     case 'Report':
       return (
         <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-indigo-50 text-indigo-700 border border-indigo-200 ${className}`}>
           <Icon name="file-text" size={12} />
-          Report
+
         </span>
       );
     case 'Photo':
       return (
         <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-purple-50 text-purple-700 border border-purple-200 ${className}`}>
           <Icon name="image" size={12} />
-          Photo
+
         </span>
       );
     case 'Video':
       return (
         <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-rose-50 text-rose-700 border border-rose-200 ${className}`}>
           <Icon name="video" size={12} />
-          Video
+
         </span>
       );
     case 'Explainer':
       return (
         <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-teal-50 text-teal-700 border border-teal-200 ${className}`}>
           <Icon name="book-open" size={12} />
-          Student Explainer
         </span>
       );
     default:

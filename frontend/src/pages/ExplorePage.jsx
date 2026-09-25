@@ -192,17 +192,6 @@ export const ExplorePage = ({
               ))}
             </select>
           </div>
-
-          {/* Help note */}
-          <div className="p-3 bg-blue-50/70 rounded-lg border border-blue-100 text-[11px] text-blue-800 space-y-1">
-            <div className="font-semibold flex items-center gap-1">
-              <Icon name="info" size={13} />
-              Cross-linked discovery
-            </div>
-            <p className="text-slate-600">
-              Opening any record shows its linked dataset, technical reports, and photos.
-            </p>
-          </div>
         </aside>
 
         {/* Right Search Results Column */}
@@ -247,17 +236,17 @@ export const ExplorePage = ({
               {filteredRecords.map((rec) => (
                 <div
                   key={rec.id}
-                  className="bg-white rounded-xl border border-slate-200 p-4 hover:border-blue-300 hover:shadow-xs transition-all flex flex-col sm:flex-row gap-4 group"
+                  className="bg-white rounded-xl border border-slate-200 p-4 transition-all flex flex-col sm:flex-row gap-4 group"
                 >
                   {/* Thumbnail */}
-                  <div 
+                  <div
                     onClick={() => onSelectRecord(rec)}
                     className="sm:w-44 h-32 rounded-lg bg-slate-100 overflow-hidden shrink-0 cursor-pointer relative"
                   >
                     <img
                       src={rec.thumbnail}
                       alt={rec.title}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
+                      className="w-full h-full object-cover"
                     />
                     <div className="absolute top-1.5 left-1.5">
                       <ContentTypeBadge type={rec.contentType} />
@@ -312,7 +301,7 @@ export const ExplorePage = ({
                         {rec.status === 'Under Review' && (
                           <button
                             onClick={() => onOpenReview(rec)}
-                            className="px-2 py-1 bg-amber-500 hover:bg-amber-600 text-white rounded text-xs font-medium transition-colors flex items-center gap-1"
+                            className="px-2 py-1 bg-amber-500  text-white rounded text-xs font-medium transition-colors flex items-center gap-1"
                           >
                             <Icon name="shield-check" size={12} />
                             Review Draft
@@ -320,19 +309,19 @@ export const ExplorePage = ({
                         )}
                         <button
                           onClick={() => onOpenStudentView(rec)}
-                          className="px-2 py-1 text-teal-700 hover:bg-teal-50 rounded text-xs font-medium transition-colors"
+                          className="px-2 py-1 text-teal-700 rounded text-xs font-medium transition-colors"
                         >
                           Student Explainer
                         </button>
                         <button
                           onClick={() => onOpenOutreach(rec)}
-                          className="px-2 py-1 text-purple-700 hover:bg-purple-50 rounded text-xs font-medium transition-colors"
+                          className="px-2 py-1 text-purple-700 rounded text-xs font-medium transition-colors"
                         >
                           Outreach Pack
                         </button>
                         <button
                           onClick={() => onSelectRecord(rec)}
-                          className="px-2.5 py-1 bg-slate-100 hover:bg-blue-600 hover:text-white text-slate-700 rounded text-xs font-semibold transition-colors flex items-center gap-1"
+                          className="px-2.5 py-1 bg-blue-600  text-white rounded text-xs font-semibold transition-colors flex items-center gap-1"
                         >
                           Details <Icon name="chevron-right" size={12} />
                         </button>

@@ -7,9 +7,6 @@ export const AboutPage = ({ onNavigate }) => {
       {/* Header */}
       <div>
         <div className="flex items-center gap-2">
-          <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 bg-blue-100 text-blue-800 rounded">
-            SIH 2026 • PS 26063
-          </span>
           <span className="text-xs text-slate-400">Theme: Smart Education / Polar Science</span>
         </div>
         <h1 className="text-2xl sm:text-4xl font-extrabold text-slate-900 tracking-tight mt-1">
@@ -51,7 +48,7 @@ export const AboutPage = ({ onNavigate }) => {
         <p>
           PolarSetu acts as an intelligent discovery and outreach layer that connects to existing archives without replacing them:
         </p>
-        
+
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
           <div className="p-4 bg-slate-50 rounded-lg border border-slate-200 space-y-2">
             <h3 className="font-bold text-slate-900 text-sm">1. Knowledge Linking</h3>
