@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { Icon } from '../components/Icon';
 import { ContentTypeBadge, RegionBadge, StatusBadge } from '../components/Badge';
+import { can, PERMISSIONS } from '../auth/permissions';
 
 export const HomePage = ({
   records,
+  currentUser,
   onNavigate,
   onSelectRecord,
   onOpenStudentView,
@@ -128,31 +130,50 @@ export const HomePage = ({
             </div>
           </div>
 
-          {/* Card 3: Share */}
-          <div
-            onClick={() => {
-              const shareRec = records.find(r => r.id === 'rec-003') || publishedRecords[0];
-              onOpenOutreach(shareRec);
-            }}
-            className="bg-white p-6 rounded-xl border border-slate-200 transition-all cursor-pointer group flex items-start gap-4"
-          >
-            <div className="w-12 h-12 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center shrink-0 transition-colors">
-              <Icon name="share" size={24} />
-            </div>
-            <div>
-              <h3 className="font-bold text-slate-900 text-base mb-1 transition-colors">
-                Share
-              </h3>
-              <p className="text-slate-600 text-xs leading-relaxed">
-                Turn verified polar science into ready-to-use social captions, media packs, and web articles.
-              </p>
-              <div className="mt-3 inline-flex items-center text-xs font-semibold text-purple-600 group-hover:underline gap-1">
-                Open Outreach Studio <Icon name="chevron-right" size={14} />
+          {/* Card 3: Share — Reviewer+ only; Login CTA for public */}
+          {can(currentUser, PERMISSIONS.VIEW_OUTREACH) ? (
+            <div
+              onClick={() => {
+                const shareRec = records.find(r => r.id === 'rec-003') || records.filter(r => r.status === 'Published')[0];
+                onOpenOutreach(shareRec);
+              }}
+              className="bg-white p-6 rounded-xl border border-slate-200 transition-all cursor-pointer group flex items-start gap-4"
+            >
+              <div className="w-12 h-12 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center shrink-0 transition-colors">
+                <Icon name="share" size={24} />
+              </div>
+              <div>
+                <h3 className="font-bold text-slate-900 text-base mb-1 transition-colors">Share</h3>
+                <p className="text-slate-600 text-xs leading-relaxed">
+                  Turn verified polar science into ready-to-use social captions, media packs, and web articles.
+                </p>
+                <div className="mt-3 inline-flex items-center text-xs font-semibold text-purple-600 group-hover:underline gap-1">
+                  Open Outreach Studio <Icon name="chevron-right" size={14} />
+                </div>
               </div>
             </div>
-          </div>
+          ) : (
+            <div
+              onClick={() => onNavigate('login')}
+              className="bg-white p-6 rounded-xl border border-dashed border-slate-300 transition-all cursor-pointer group flex items-start gap-4 opacity-80 hover:opacity-100"
+            >
+              <div className="w-12 h-12 rounded-xl bg-slate-100 text-slate-400 flex items-center justify-center shrink-0">
+                <Icon name="shield-check" size={24} />
+              </div>
+              <div>
+                <h3 className="font-bold text-slate-700 text-base mb-1">Outreach Studio</h3>
+                <p className="text-slate-500 text-xs leading-relaxed">
+                  Requires Reviewer access. Log in with a Reviewer or Admin account to generate social media packs.
+                </p>
+                <div className="mt-3 inline-flex items-center text-xs font-semibold text-blue-600 group-hover:underline gap-1">
+                  Login to Access <Icon name="chevron-right" size={14} />
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </section>
+
 
 
       {/* Featured Verified Research Records */}

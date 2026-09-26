@@ -1,9 +1,11 @@
 import React, { useState, useMemo } from 'react';
 import { Icon } from '../components/Icon';
 import { ContentTypeBadge, RegionBadge, StatusBadge } from '../components/Badge';
+import { can, canAccessReview, PERMISSIONS } from '../auth/permissions';
 
 export const ExplorePage = ({
   records,
+  currentUser,
   initialQuery = '',
   onSelectRecord,
   onOpenStudentView,
@@ -298,13 +300,14 @@ export const ExplorePage = ({
 
                       {/* Action Links */}
                       <div className="flex items-center gap-2">
-                        {rec.status === 'Under Review' && (
+                        {/* Review Draft — Reviewer/Admin or Author Researcher */}
+                        {canAccessReview(currentUser, rec) && (rec.status === 'Under Review' || rec.status === 'Changes Requested') && (
                           <button
                             onClick={() => onOpenReview(rec)}
-                            className="px-2 py-1 bg-amber-500  text-white rounded text-xs font-medium transition-colors flex items-center gap-1"
+                            className="px-2 py-1 bg-amber-500 text-white rounded text-xs font-medium transition-colors flex items-center gap-1 shadow-2xs hover:bg-amber-600"
                           >
                             <Icon name="shield-check" size={12} />
-                            Review Draft
+                            {currentUser.role === 'Researcher' ? 'AI Draft' : 'Review Draft'}
                           </button>
                         )}
                         <button
@@ -313,15 +316,18 @@ export const ExplorePage = ({
                         >
                           Student Explainer
                         </button>
-                        <button
-                          onClick={() => onOpenOutreach(rec)}
-                          className="px-2 py-1 text-purple-700 rounded text-xs font-medium transition-colors"
-                        >
-                          Outreach Pack
-                        </button>
+                        {/* Outreach Pack — Reviewer+ only */}
+                        {can(currentUser, PERMISSIONS.VIEW_OUTREACH) && (
+                          <button
+                            onClick={() => onOpenOutreach(rec)}
+                            className="px-2 py-1 text-purple-700 rounded text-xs font-medium transition-colors"
+                          >
+                            Outreach Pack
+                          </button>
+                        )}
                         <button
                           onClick={() => onSelectRecord(rec)}
-                          className="px-2.5 py-1 bg-blue-600  text-white rounded text-xs font-semibold transition-colors flex items-center gap-1"
+                          className="px-2.5 py-1 bg-blue-600 text-white rounded text-xs font-semibold transition-colors flex items-center gap-1"
                         >
                           Details <Icon name="chevron-right" size={12} />
                         </button>

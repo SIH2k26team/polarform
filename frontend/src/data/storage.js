@@ -79,8 +79,8 @@ export const getCurrentUser = () => {
     const saved = localStorage.getItem(STORAGE_KEYS.CURRENT_USER);
     if (saved) return JSON.parse(saved);
   } catch (e) {}
-  // Default to Reviewer for demoing the review gate & core workflow seamlessly
-  const defaultUser = DEMO_USERS[1]; // Dr. P. Sunitha (Reviewer)
+  // Default to Public / General User (no login required)
+  const defaultUser = DEMO_USERS[0];
   localStorage.setItem(STORAGE_KEYS.CURRENT_USER, JSON.stringify(defaultUser));
   return defaultUser;
 };
@@ -95,11 +95,11 @@ export const resetToDefaultData = () => {
   localStorage.setItem(STORAGE_KEYS.RECORDS, JSON.stringify(INITIAL_RECORDS));
   localStorage.setItem(STORAGE_KEYS.AUDIT_LOGS, JSON.stringify(INITIAL_AUDIT_LOGS));
   localStorage.setItem(STORAGE_KEYS.EXPEDITIONS, JSON.stringify(INITIAL_EXPEDITIONS));
-  localStorage.setItem(STORAGE_KEYS.CURRENT_USER, JSON.stringify(DEMO_USERS[1]));
+  localStorage.setItem(STORAGE_KEYS.CURRENT_USER, JSON.stringify(DEMO_USERS[0]));
   return {
     records: INITIAL_RECORDS,
     auditLogs: INITIAL_AUDIT_LOGS,
     expeditions: INITIAL_EXPEDITIONS,
-    currentUser: DEMO_USERS[1]
+    currentUser: DEMO_USERS[0]
   };
 };

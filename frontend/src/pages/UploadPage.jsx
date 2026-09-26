@@ -48,7 +48,6 @@ export const UploadPage = ({
 
   const handleFileSelected = (file) => {
     setSelectedFile(file);
-    // Auto populate sample details if empty
     if (!title) {
       const cleanName = file.name.replace(/\.[^/.]+$/, "");
       setTitle(`Expedition Report: ${cleanName.replace(/[-_]/g, ' ')}`);
@@ -58,14 +57,18 @@ export const UploadPage = ({
     }
   };
 
-  // Crossref Real/Mock Metadata Lookup Demo
+  const handleRemoveFile = (e) => {
+    e.stopPropagation();
+    setSelectedFile(null);
+  };
+
+  // Crossref Real/Mock Metadata Lookup
   const handleEnrichFromCrossref = async () => {
     const testDoi = doiInput.trim() || '10.1016/j.polar.2023.100987';
     setIsFetchingDoi(true);
     setDoiSuccessMsg('');
 
     try {
-      // Fetch from official Crossref REST API (Public, no auth needed)
       const res = await fetch(`https://api.crossref.org/works/${encodeURIComponent(testDoi)}`, {
         headers: {
           'Accept': 'application/json'
@@ -90,11 +93,9 @@ export const UploadPage = ({
           setDoiSuccessMsg(`✓ Successfully auto-filled citation metadata from Crossref (DOI: ${testDoi})`);
         }
       } else {
-        // Fallback demo enrichment
         useDemoDoiEnrichment(testDoi);
       }
     } catch (err) {
-      // Fallback in case of offline/CORS
       useDemoDoiEnrichment(testDoi);
     } finally {
       setIsFetchingDoi(false);
@@ -122,6 +123,28 @@ export const UploadPage = ({
     setNpdcId("NPDC-CHEM-2023-088");
   };
 
+  const handleClearForm = () => {
+    setTitle('');
+    setContentType('Report');
+    setRegion('Antarctica');
+    setLocation('');
+    setTags('');
+    setDescription('');
+    setAbstract('');
+    setDoi('');
+    setDoiInput('');
+    setNpdcId('');
+    setSelectedFile(null);
+    setDoiSuccessMsg('');
+  };
+
+  const handleAddTag = (newTag) => {
+    const currentTags = tags.split(',').map(t => t.trim()).filter(Boolean);
+    if (!currentTags.includes(newTag)) {
+      setTags([...currentTags, newTag].join(', '));
+    }
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!title.trim()) {
@@ -131,7 +154,6 @@ export const UploadPage = ({
 
     setIsProcessing(true);
 
-    // Simulate PDF Text Extraction & AI Suggestion Draft Generation
     setTimeout(() => {
       const newRecordId = `rec-${Date.now().toString().slice(-4)}`;
       const newRecord = {
@@ -147,15 +169,15 @@ export const UploadPage = ({
         authorId: currentUser.id || "sci-1",
         authorName: currentUser.name,
         institution: currentUser.designation?.split(',')[1]?.trim() || "NCPOR, MoES",
-        status: "Under Review", // Mandatory Human Review Gate
+        status: "Under Review",
         doi: doi.trim() || null,
         npdcDatasetId: npdcId.trim() || null,
         isMock: true,
         thumbnail: contentType === 'Photo'
           ? "https://images.unsplash.com/photo-1598439210625-5067c578f3f6?auto=format&fit=crop&w=800&q=80"
           : contentType === 'Video'
-          ? "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=800&q=80"
-          : "https://images.unsplash.com/photo-1517411032315-54ef2cb783bb?auto=format&fit=crop&w=800&q=80",
+            ? "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=800&q=80"
+            : "https://images.unsplash.com/photo-1517411032315-54ef2cb783bb?auto=format&fit=crop&w=800&q=80",
         tags: tags.split(',').map(t => t.trim()).filter(Boolean),
         description: description.trim() || "Uploaded scientific report document.",
         abstract: abstract.trim() || description.trim(),
@@ -165,7 +187,6 @@ export const UploadPage = ({
         linkedVideosCount: 0,
         linkedScientistsCount: 2,
 
-        // AI Generated Draft Suggestions (Advisory draft, awaits human approval)
         aiDraft: {
           generatedAt: new Date().toISOString(),
           model: "PolarAI-Assist v1.2 (Advisory)",
@@ -198,273 +219,318 @@ export const UploadPage = ({
 
       setIsProcessing(false);
       onRecordCreated(newRecord);
-    }, 1200);
+    }, 1000);
   };
+
+  const sampleTags = ["Ice Core", "Glaciology", "Atmosphere", "Biodiversity", "Oceanography", "Himadri", "Bharati", "Maitri"];
 
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8 space-y-6">
-      {/* Header matching Reference UI */}
-      <div>
-        <h1 className="text-2xl sm:text-3xl font-bold text-slate-900">
-          Upload New Record
-        </h1>
-        <p className="text-xs sm:text-sm text-slate-500 mt-1">
-          Add scientific reports, datasets, field photos, or videos to the unified knowledge graph
-        </p>
-      </div>
-
-      {/* Safety Notice */}
-      <div className="bg-amber-50 border border-amber-200 rounded-lg p-3.5 flex items-start gap-3 text-xs text-amber-900">
-        <div className="p-1 rounded-full bg-amber-100 text-amber-700 shrink-0 mt-0.5">
-          <Icon name="shield-check" size={16} />
-        </div>
-        <div className="space-y-0.5">
-          <span className="font-bold">Human Review Gate Activated</span>
-          <p className="text-amber-800 text-[11px] leading-relaxed">
-            Uploaded records are parsed by AI to generate suggested tags, student summaries, and social captions. 
-            <strong> The AI output remains a private draft</strong> until verified and approved by a designated reviewer.
+      {/* Top Header */}
+      <div className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-200 pb-4">
+        <div>
+          <button
+            onClick={() => onNavigate('explore')}
+            className="text-xs text-slate-500 hover:text-slate-800 flex items-center gap-1 mb-1 font-medium"
+          >
+            <Icon name="arrow-left" size={13} /> Back to Explore
+          </button>
+          <h1 className="text-2xl font-bold text-slate-900 tracking-tight">
+            Submit Polar Research Record
+          </h1>
+          <p className="text-xs text-slate-500 mt-0.5">
+            Add reports, datasets, photos, or expedition notes to the Indian polar repository
           </p>
         </div>
-      </div>
 
-      <form onSubmit={handleSubmit} className="bg-white p-6 rounded-xl border border-slate-200 shadow-xs space-y-6">
-        {/* Drag and Drop Zone matching Reference Screenshot */}
-        <div
-          onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
-          onDragLeave={() => setIsDragging(false)}
-          onDrop={handleFileDrop}
-          className={`border-2 border-dashed rounded-xl p-8 text-center transition-all cursor-pointer ${
-            isDragging
-              ? 'border-blue-500 bg-blue-50/50'
-              : selectedFile
-              ? 'border-emerald-400 bg-emerald-50/30'
-              : 'border-slate-300 hover:border-blue-400 bg-slate-50/50'
-          }`}
-          onClick={() => document.getElementById('file-input').click()}
-        >
-          <input
-            id="file-input"
-            type="file"
-            className="hidden"
-            onChange={(e) => e.target.files && handleFileSelected(e.target.files[0])}
-            accept=".pdf,.jpg,.jpeg,.png,.mp4,.csv,.nc"
-          />
-          <div className="w-12 h-12 rounded-full bg-blue-50 text-blue-600 mx-auto flex items-center justify-center mb-3">
-            <Icon name="upload" size={24} />
-          </div>
-          {selectedFile ? (
-            <div className="space-y-1">
-              <p className="text-xs font-bold text-emerald-800 flex items-center justify-center gap-1.5">
-                <Icon name="check" size={16} /> File Selected: {selectedFile.name}
-              </p>
-              <p className="text-[11px] text-slate-500">
-                {(selectedFile.size / (1024 * 1024)).toFixed(2)} MB • Ready for text extraction & AI drafting
-              </p>
-            </div>
-          ) : (
-            <div className="space-y-1">
-              <p className="text-sm font-semibold text-slate-800">
-                Drag and drop files here, or <span className="text-blue-600 underline">click to upload</span>
-              </p>
-              <p className="text-xs text-slate-400">
-                Supports Images, PDFs, Videos, Datasets (max 50MB)
-              </p>
-            </div>
-          )}
-        </div>
-
-        {/* Demo Helper Button */}
-        <div className="flex items-center justify-between pt-1">
-          <span className="text-xs text-slate-500 font-medium">Record Metadata Form</span>
+        {/* Quick Helper Actions */}
+        <div className="flex items-center gap-2">
           <button
             type="button"
             onClick={handleFillSample}
-            className="text-xs text-blue-600 hover:text-blue-800 font-medium flex items-center gap-1 bg-blue-50 px-2.5 py-1 rounded"
+            className="text-xs px-3 py-1.5 bg-blue-50 text-blue-700 hover:bg-blue-100 rounded-lg font-medium border border-blue-200 flex items-center gap-1.5 transition-colors"
           >
-            <Icon name="sparkles" size={13} /> Auto-fill sample Antarctica report
+            <Icon name="sparkles" size={13} /> Fill Sample Antarctica Data
+          </button>
+          <button
+            type="button"
+            onClick={handleClearForm}
+            className="text-xs px-3 py-1.5 bg-slate-100 text-slate-600 hover:bg-slate-200 rounded-lg font-medium transition-colors"
+          >
+            Clear Form
           </button>
         </div>
+      </div>
 
-        {/* Form Inputs Grid matching Reference UI */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {/* Title */}
-          <div className="space-y-1.5 md:col-span-2">
-            <label className="block text-xs font-bold text-slate-700">
-              Title <span className="text-rose-500">*</span>
-            </label>
+
+
+      <form onSubmit={handleSubmit} className="space-y-6">
+        {/* Section 1: File Upload */}
+        <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-xs space-y-3">
+          <div className="flex items-center justify-between">
+            <h2 className="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
+              Upload File or Document
+            </h2>
+            <span className="text-[11px] text-slate-400">PDF, JPG, PNG, CSV, MP4 (Max 50MB)</span>
+          </div>
+
+          <div
+            onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
+            onDragLeave={() => setIsDragging(false)}
+            onDrop={handleFileDrop}
+            onClick={() => document.getElementById('file-upload-input').click()}
+            className={`border-2 border-dashed rounded-xl p-6 text-center cursor-pointer transition-colors ${isDragging
+              ? 'border-blue-500 bg-blue-50/50'
+              : selectedFile
+                ? 'border-emerald-400 bg-emerald-50/30'
+                : 'border-slate-300 hover:border-slate-400 bg-slate-50/50'
+              }`}
+          >
             <input
-              type="text"
-              required
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              placeholder="e.g. Indian Antarctic Expedition 2022: Ice Core Study"
-              className="w-full text-xs p-2.5 bg-white border border-slate-300 rounded-lg text-slate-800 focus:ring-1 focus:ring-blue-500 focus:outline-none"
+              id="file-upload-input"
+              type="file"
+              className="hidden"
+              onChange={(e) => e.target.files && handleFileSelected(e.target.files[0])}
+              accept=".pdf,.jpg,.jpeg,.png,.mp4,.csv,.nc"
             />
-          </div>
 
-          {/* Content Type */}
-          <div className="space-y-1.5">
-            <label className="block text-xs font-bold text-slate-700">
-              Content Type <span className="text-rose-500">*</span>
-            </label>
-            <select
-              value={contentType}
-              onChange={(e) => setContentType(e.target.value)}
-              className="w-full text-xs p-2.5 bg-white border border-slate-300 rounded-lg text-slate-800 focus:ring-1 focus:ring-blue-500 focus:outline-none"
-            >
-              <option value="Report">Report (PDF / Document)</option>
-              <option value="Dataset">Dataset (NPDC Link / CSV)</option>
-              <option value="Photo">Photo / Image Collection</option>
-              <option value="Video">Video / Audio Log</option>
-              <option value="Explainer">Student Explainer</option>
-            </select>
-          </div>
-
-          {/* Expedition */}
-          <div className="space-y-1.5">
-            <label className="block text-xs font-bold text-slate-700">
-              Expedition Anchor <span className="text-rose-500">*</span>
-            </label>
-            <select
-              value={expeditionId}
-              onChange={handleExpeditionChange}
-              className="w-full text-xs p-2.5 bg-white border border-slate-300 rounded-lg text-slate-800 focus:ring-1 focus:ring-blue-500 focus:outline-none"
-            >
-              {expeditions.map((exp) => (
-                <option key={exp.id} value={exp.id}>
-                  {exp.name}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {/* Region & Location */}
-          <div className="space-y-1.5">
-            <label className="block text-xs font-bold text-slate-700">
-              Region
-            </label>
-            <input
-              type="text"
-              value={region}
-              onChange={(e) => setRegion(e.target.value)}
-              className="w-full text-xs p-2.5 bg-slate-50 border border-slate-300 rounded-lg text-slate-800 focus:ring-1 focus:ring-blue-500 focus:outline-none"
-            />
-          </div>
-
-          <div className="space-y-1.5">
-            <label className="block text-xs font-bold text-slate-700">
-              Station / Location
-            </label>
-            <input
-              type="text"
-              value={location}
-              onChange={(e) => setLocation(e.target.value)}
-              placeholder="e.g. Bharati Station, Ny-Ålesund"
-              className="w-full text-xs p-2.5 bg-white border border-slate-300 rounded-lg text-slate-800 focus:ring-1 focus:ring-blue-500 focus:outline-none"
-            />
-          </div>
-
-          {/* Tags */}
-          <div className="space-y-1.5 md:col-span-2">
-            <label className="block text-xs font-bold text-slate-700">
-              Tags (comma separated)
-            </label>
-            <input
-              type="text"
-              value={tags}
-              onChange={(e) => setTags(e.target.value)}
-              placeholder="Enter tags (comma separated): e.g. Ice Core, Glaciology, Antarctica"
-              className="w-full text-xs p-2.5 bg-white border border-slate-300 rounded-lg text-slate-800 focus:ring-1 focus:ring-blue-500 focus:outline-none"
-            />
-          </div>
-
-          {/* Description */}
-          <div className="space-y-1.5 md:col-span-2">
-            <label className="block text-xs font-bold text-slate-700">
-              Description / Scientific Summary
-            </label>
-            <textarea
-              rows={3}
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              placeholder="Provide a technical summary of the uploaded record or dataset..."
-              className="w-full text-xs p-2.5 bg-white border border-slate-300 rounded-lg text-slate-800 focus:ring-1 focus:ring-blue-500 focus:outline-none"
-            />
+            {selectedFile ? (
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-3 p-3 bg-white rounded-lg border border-emerald-200">
+                <div className="flex items-center gap-3 text-left">
+                  <div className="w-10 h-10 rounded-lg bg-emerald-100 text-emerald-800 flex items-center justify-center shrink-0">
+                    <Icon name="file-text" size={20} />
+                  </div>
+                  <div>
+                    <p className="text-xs font-bold text-slate-800 truncate max-w-sm">
+                      {selectedFile.name}
+                    </p>
+                    <p className="text-[11px] text-slate-400">
+                      {(selectedFile.size / (1024 * 1024)).toFixed(2)} MB • Selected for upload
+                    </p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={handleRemoveFile}
+                  className="text-xs text-rose-600 hover:text-rose-800 font-medium px-2 py-1 hover:bg-rose-50 rounded"
+                >
+                  Remove file
+                </button>
+              </div>
+            ) : (
+              <div className="space-y-2 py-2">
+                <div className="w-10 h-10 rounded-full bg-slate-100 text-slate-500 mx-auto flex items-center justify-center">
+                  <Icon name="upload" size={20} />
+                </div>
+                <div>
+                  <p className="text-xs font-semibold text-slate-700">
+                    Click to select file or drag & drop here
+                  </p>
+                  <p className="text-[11px] text-slate-400">
+                    Scientific papers, field photos, raw datasets, or expedition reports
+                  </p>
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
-        {/* Optional Crossref DOI / NPDC Link Integration Box */}
-        <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-3">
+        {/* Section 2: Expedition & Location */}
+        <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-xs space-y-4">
+          <h2 className="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
+            Expedition & Geographic Anchor
+          </h2>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5">
+            <div className="space-y-1 md:col-span-3">
+              <label className="block text-[11px] font-semibold text-slate-700">
+                Expedition <span className="text-rose-500">*</span>
+              </label>
+              <select
+                value={expeditionId}
+                onChange={handleExpeditionChange}
+                className="w-full text-xs p-2.5 bg-white border border-slate-300 rounded-lg text-slate-800 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              >
+                {expeditions.map((exp) => (
+                  <option key={exp.id} value={exp.id}>
+                    {exp.name} ({exp.region})
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="space-y-1">
+              <label className="block text-[11px] font-semibold text-slate-700">Region</label>
+              <input
+                type="text"
+                value={region}
+                onChange={(e) => setRegion(e.target.value)}
+                placeholder="e.g. Antarctica, Arctic, Himalayas"
+                className="w-full text-xs p-2.5 bg-slate-50 border border-slate-300 rounded-lg text-slate-800 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              />
+            </div>
+
+            <div className="space-y-1 md:col-span-2">
+              <label className="block text-[11px] font-semibold text-slate-700">Station / Field Location</label>
+              <input
+                type="text"
+                value={location}
+                onChange={(e) => setLocation(e.target.value)}
+                placeholder="e.g. Bharati Station, Maitri Station, Ny-Ålesund, Himansh"
+                className="w-full text-xs p-2.5 bg-white border border-slate-300 rounded-lg text-slate-800 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Section 3: Record Details & Metadata */}
+        <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-xs space-y-4">
+          <h2 className="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
+            Record Details & Scientific Summary
+          </h2>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5">
+            <div className="space-y-1 md:col-span-2">
+              <label className="block text-[11px] font-semibold text-slate-700">
+                Title of Record <span className="text-rose-500">*</span>
+              </label>
+              <input
+                type="text"
+                required
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                placeholder="e.g. Indian Antarctic Expedition 2022: Ice Core Study"
+                className="w-full text-xs p-2.5 bg-white border border-slate-300 rounded-lg text-slate-800 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              />
+            </div>
+
+            <div className="space-y-1">
+              <label className="block text-[11px] font-semibold text-slate-700">
+                Content Type <span className="text-rose-500">*</span>
+              </label>
+              <select
+                value={contentType}
+                onChange={(e) => setContentType(e.target.value)}
+                className="w-full text-xs p-2.5 bg-white border border-slate-300 rounded-lg text-slate-800 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              >
+                <option value="Report">Report (PDF / Technical Paper)</option>
+                <option value="Dataset">Dataset (Data Tables / NetCDF)</option>
+                <option value="Photo">Photo (Field Image Collection)</option>
+                <option value="Video">Video (Expedition Footage)</option>
+                <option value="Explainer">Student Explainer</option>
+              </select>
+            </div>
+
+            <div className="space-y-1 md:col-span-3">
+              <label className="block text-[11px] font-semibold text-slate-700">
+                Keywords & Tags (comma separated)
+              </label>
+              <input
+                type="text"
+                value={tags}
+                onChange={(e) => setTags(e.target.value)}
+                placeholder="e.g. Ice Core, Glaciology, Paleoclimate, NCPOR"
+                className="w-full text-xs p-2.5 bg-white border border-slate-300 rounded-lg text-slate-800 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              />
+              <div className="flex flex-wrap items-center gap-1.5 pt-1">
+                <span className="text-[10px] text-slate-400 font-medium">Quick suggestions:</span>
+                {sampleTags.map(tag => (
+                  <button
+                    key={tag}
+                    type="button"
+                    onClick={() => handleAddTag(tag)}
+                    className="text-[10px] bg-slate-100 hover:bg-slate-200 text-slate-600 px-2 py-0.5 rounded transition-colors"
+                  >
+                    +{tag}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="space-y-1 md:col-span-3">
+              <label className="block text-[11px] font-semibold text-slate-700">
+                Scientific Description / Abstract
+              </label>
+              <textarea
+                rows={3}
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                placeholder="Summary of methodology, observations, and primary conclusions..."
+                className="w-full text-xs p-2.5 bg-white border border-slate-300 rounded-lg text-slate-800 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Section 4: External Linking (Optional) */}
+        <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-xs space-y-3">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
-              <Icon name="globe" size={14} className="text-blue-600" />
-              External Metadata Linkage (Crossref API & NPDC)
-            </span>
-            <span className="text-[10px] text-slate-400 bg-white px-2 py-0.5 rounded border border-slate-200">
-              Optional Enrichment
-            </span>
+            <h2 className="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
+              External Metadata & DOI Linking
+            </h2>
+            <span className="text-[11px] text-slate-400">Optional</span>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
             <div className="space-y-1">
-              <label className="text-[11px] font-semibold text-slate-600">Publication DOI</label>
+              <label className="block text-[11px] font-semibold text-slate-700">Publication DOI</label>
               <div className="flex gap-2">
                 <input
                   type="text"
                   value={doiInput}
                   onChange={(e) => setDoiInput(e.target.value)}
                   placeholder="e.g. 10.1016/j.polar.2023.100987"
-                  className="flex-1 text-xs p-2 bg-white border border-slate-300 rounded text-slate-800 focus:outline-none"
+                  className="flex-1 text-xs p-2.5 bg-white border border-slate-300 rounded-lg text-slate-800 focus:outline-none focus:ring-1 focus:ring-blue-500"
                 />
                 <button
                   type="button"
                   onClick={handleEnrichFromCrossref}
                   disabled={isFetchingDoi}
-                  className="px-3 py-1.5 bg-slate-800 hover:bg-slate-900 text-white rounded text-xs font-medium transition-colors shrink-0 disabled:opacity-50"
+                  className="px-3 py-2 bg-slate-800 hover:bg-slate-900 text-white rounded-lg text-xs font-medium transition-colors shrink-0 disabled:opacity-50"
                 >
-                  {isFetchingDoi ? "Fetching..." : "Fetch DOI"}
+                  {isFetchingDoi ? "Fetching..." : "Fetch Metadata"}
                 </button>
               </div>
             </div>
 
             <div className="space-y-1">
-              <label className="text-[11px] font-semibold text-slate-600">NPDC Dataset Reference ID</label>
+              <label className="block text-[11px] font-semibold text-slate-700">NPDC Dataset Reference ID</label>
               <input
                 type="text"
                 value={npdcId}
                 onChange={(e) => setNpdcId(e.target.value)}
                 placeholder="e.g. NPDC-DS-2023-ANT-012"
-                className="w-full text-xs p-2 bg-white border border-slate-300 rounded text-slate-800 focus:outline-none"
+                className="w-full text-xs p-2.5 bg-white border border-slate-300 rounded-lg text-slate-800 focus:outline-none focus:ring-1 focus:ring-blue-500"
               />
             </div>
           </div>
 
           {doiSuccessMsg && (
-            <p className="text-[11px] text-emerald-700 bg-emerald-50 p-2 rounded border border-emerald-200">
+            <p className="text-[11px] text-emerald-800 bg-emerald-50 p-2.5 rounded-lg border border-emerald-200">
               {doiSuccessMsg}
             </p>
           )}
         </div>
 
-        {/* Submit Action */}
-        <div className="pt-3 border-t border-slate-100 flex items-center justify-between">
-          <div className="text-xs text-slate-500">
-            Uploader: <strong>{currentUser.name}</strong> ({currentUser.role})
+        {/* Submit Action Strip */}
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 p-4 bg-slate-100 rounded-xl border border-slate-200">
+          <div className="text-xs text-slate-600">
+            Submitting as: <strong className="text-slate-800">{currentUser.name}</strong> ({currentUser.role})
           </div>
           <button
             type="submit"
             disabled={isProcessing}
-            className="w-full sm:w-auto px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-bold shadow-xs transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
+            className="w-full sm:w-auto px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-bold shadow-xs transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
           >
             {isProcessing ? (
               <>
-                <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
-                <span>Extracting Text & Generating AI Draft...</span>
+                <span className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+                <span>Submitting & Preparing Draft...</span>
               </>
             ) : (
               <>
-                <Icon name="sparkles" size={15} />
-                <span>Upload & Generate AI Draft</span>
+                <Icon name="upload" size={14} />
+                <span>Submit Record for Review</span>
               </>
             )}
           </button>

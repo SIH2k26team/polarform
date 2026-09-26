@@ -2,10 +2,12 @@ import React, { useState } from 'react';
 import { Icon } from '../components/Icon';
 import { ContentTypeBadge, RegionBadge, StatusBadge } from '../components/Badge';
 import { INITIAL_SCIENTISTS } from '../data/mockData';
+import { can, canAccessReview, PERMISSIONS } from '../auth/permissions';
 
 export const RecordDetailsPage = ({
   record,
   allRecords,
+  currentUser,
   onNavigate,
   onOpenStudentView,
   onOpenOutreach,
@@ -97,19 +99,24 @@ export const RecordDetailsPage = ({
             <Icon name="book-open" size={14} /> Student Explainer
           </button>
 
-          <button
-            onClick={() => onOpenOutreach(record)}
-            className="px-3.5 py-1.5 bg-purple-50 hover:bg-purple-100 text-purple-700 rounded-lg text-xs font-semibold transition-colors flex items-center gap-1.5"
-          >
-            <Icon name="share" size={14} /> Outreach Post Studio
-          </button>
+          {/* Outreach Studio — Reviewer+ only */}
+          {can(currentUser, PERMISSIONS.VIEW_OUTREACH) && (
+            <button
+              onClick={() => onOpenOutreach(record)}
+              className="px-3.5 py-1.5 bg-purple-50 hover:bg-purple-100 text-purple-700 rounded-lg text-xs font-semibold transition-colors flex items-center gap-1.5"
+            >
+              <Icon name="share" size={14} /> Outreach Post Studio
+            </button>
+          )}
 
-          {record.status === 'Under Review' && (
+          {/* Review Gate — Reviewer/Admin or Author Researcher */}
+          {canAccessReview(currentUser, record) && (
             <button
               onClick={() => onOpenReview(record)}
-              className="px-3.5 py-1.5 bg-amber-500 hover:bg-amber-600 text-white rounded-lg text-xs font-semibold transition-colors flex items-center gap-1.5"
+              className="px-3.5 py-1.5 bg-amber-500 hover:bg-amber-600 text-white rounded-lg text-xs font-semibold transition-colors flex items-center gap-1.5 shadow-2xs"
             >
-              <Icon name="shield-check" size={14} /> Review AI Draft
+              <Icon name="shield-check" size={14} />
+              {currentUser.role === 'Researcher' ? 'Inspect / Edit AI Draft' : 'Review AI Draft'}
             </button>
           )}
         </div>

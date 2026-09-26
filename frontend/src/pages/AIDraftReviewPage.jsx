@@ -1,51 +1,129 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Icon } from '../components/Icon';
 import { StatusBadge, ContentTypeBadge, RegionBadge } from '../components/Badge';
+import { AccessDeniedPage } from '../components/AccessDenied';
+import { can, isResearcher, isReviewer, isAdmin, isAuthor, PERMISSIONS } from '../auth/permissions';
 
 export const AIDraftReviewPage = ({
-  record,
+  record: initialRecord,
+  allRecords = [],
   currentUser,
   onApproveAndPublish,
   onRequestChanges,
   onUpdateDraft,
   onOpenStudentView,
   onOpenOutreach,
-  onBackToExplore
+  onSelectRecord,
+  onBackToExplore,
+  onNavigate
 }) => {
-  if (!record) {
+  // ── Access check: Reviewer, Admin, or Researcher ─────────────────────────
+  if (!can(currentUser, PERMISSIONS.VIEW_REVIEW_GATE)) {
     return (
-      <div className="max-w-4xl mx-auto px-4 py-16 text-center space-y-4">
-        <div className="w-12 h-12 rounded-full bg-slate-100 text-slate-400 mx-auto flex items-center justify-center">
-          <Icon name="shield-check" size={24} />
-        </div>
-        <h2 className="text-xl font-bold text-slate-800">No Record Selected for Review</h2>
-        <p className="text-xs text-slate-500">Please choose a pending record from the Explore page or Review Queue.</p>
-        <button
-          onClick={onBackToExplore}
-          className="px-4 py-2 bg-blue-600 text-white text-xs font-semibold rounded-lg hover:bg-blue-700"
-        >
-          Go to Explore Records
-        </button>
-      </div>
+      <AccessDeniedPage
+        currentUser={currentUser}
+        requiredRole="Researcher, Reviewer, or Admin"
+        onNavigate={onBackToExplore}
+      />
     );
   }
 
+  const isUserResearcher = isResearcher(currentUser);
+  const isUserStaff = isReviewer(currentUser) || isAdmin(currentUser);
+
+  // For researchers, filter accessible records to only their own
+  const myAccessibleRecords = isUserResearcher
+    ? allRecords.filter(r => isAuthor(currentUser, r))
+    : allRecords;
+
+  // Determine current active record
+  // If researcher and initialRecord is not theirs, pick their first accessible record
+  let currentRecord = initialRecord;
+  if (isUserResearcher && initialRecord && !isAuthor(currentUser, initialRecord)) {
+    currentRecord = myAccessibleRecords[0] || null;
+  }
+  if (!currentRecord && myAccessibleRecords.length > 0) {
+    currentRecord = myAccessibleRecords[0];
+  }
+
+  const [activeRecordId, setActiveRecordId] = useState(currentRecord?.id || null);
+
+  useEffect(() => {
+    if (currentRecord?.id) {
+      setActiveRecordId(currentRecord.id);
+    }
+  }, [currentRecord?.id]);
+
+  // If activeRecordId changed, find the record
+  const record = allRecords.find(r => r.id === activeRecordId) || currentRecord;
+
+  // Form & Editing state
   const [isEditing, setIsEditing] = useState(false);
-  const [editedExplainerBody, setEditedExplainerBody] = useState(
-    record.aiDraft?.studentExplainer?.bodyText || record.description
-  );
-  const [editedExplainerIntro, setEditedExplainerIntro] = useState(
-    record.aiDraft?.studentExplainer?.intro || ''
-  );
-  const [editedCaption, setEditedCaption] = useState(
-    record.aiDraft?.socialCaption?.body || ''
-  );
-  const [editedHashtags, setEditedHashtags] = useState(
-    record.aiDraft?.socialCaption?.hashtags?.join(' ') || '#PolarScience #Antarctica #NCPOR'
-  );
-  const [reviewNotes, setReviewNotes] = useState(
-    `Verified scientific claims against ${record.expeditionName}. Terminology and facts checked.`
-  );
+  const [showRejectForm, setShowRejectForm] = useState(false);
+  const [rejectFeedback, setRejectFeedback] = useState('Please clarify the baseline measurement depth figures and confirm station coordinates.');
+  
+  // Verification Checklist State (Reviewer / Admin)
+  const [checkedData, setCheckedData] = useState(true);
+  const [checkedLanguage, setCheckedLanguage] = useState(true);
+  const [checkedCitation, setCheckedCitation] = useState(true);
+
+  // Editable Draft Fields
+  const [editedExplainerIntro, setEditedExplainerIntro] = useState('');
+  const [editedExplainerBody, setEditedExplainerBody] = useState('');
+  const [editedCaption, setEditedCaption] = useState('');
+  const [editedHook, setEditedHook] = useState('');
+  const [editedHashtags, setEditedHashtags] = useState('');
+  const [reviewNotes, setReviewNotes] = useState('');
+
+  // Sync state when active record changes
+  useEffect(() => {
+    if (record) {
+      setEditedExplainerIntro(record.aiDraft?.studentExplainer?.intro || '');
+      setEditedExplainerBody(record.aiDraft?.studentExplainer?.bodyText || record.description || '');
+      setEditedCaption(record.aiDraft?.socialCaption?.body || '');
+      setEditedHook(record.aiDraft?.socialCaption?.hook || '❄️ Polar Science Discovery Update');
+      setEditedHashtags(record.aiDraft?.socialCaption?.hashtags?.join(' ') || '#PolarScience #Antarctica #NCPOR #MoES');
+      setReviewNotes(
+        `Verified scientific claims against ${record.expeditionName}. Plain-language summary and parameters approved.`
+      );
+      setIsEditing(false);
+    }
+  }, [record?.id]);
+
+  // If no record found at all
+  if (!record) {
+    return (
+      <div className="max-w-4xl mx-auto px-4 py-16 text-center space-y-4">
+        <div className="w-14 h-14 rounded-full bg-blue-50 text-blue-600 mx-auto flex items-center justify-center">
+          <Icon name="shield-check" size={28} />
+        </div>
+        <h2 className="text-xl font-bold text-slate-800">
+          {isUserResearcher ? 'No Submissions Found for Your Account' : 'No Submissions in Review Queue'}
+        </h2>
+        <p className="text-xs text-slate-500 max-w-md mx-auto">
+          {isUserResearcher
+            ? 'As a Researcher, your uploaded records and their AI drafts will appear here for you to inspect and refine before review.'
+            : 'There are currently no records pending review in the queue.'}
+        </p>
+        <div className="flex items-center justify-center gap-3 pt-2">
+          {isUserResearcher && onNavigate && (
+            <button
+              onClick={() => onNavigate('upload')}
+              className="px-4 py-2 bg-blue-600 text-white text-xs font-semibold rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-1.5"
+            >
+              <Icon name="upload" size={14} /> Upload a Research Record
+            </button>
+          )}
+          <button
+            onClick={onBackToExplore}
+            className="px-4 py-2 bg-slate-100 text-slate-700 text-xs font-semibold rounded-lg hover:bg-slate-200 transition-colors"
+          >
+            Go to Explore Records
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   const handleSaveEdits = () => {
     const updatedDraft = {
@@ -57,6 +135,7 @@ export const AIDraftReviewPage = ({
       },
       socialCaption: {
         ...record.aiDraft?.socialCaption,
+        hook: editedHook,
         body: editedCaption,
         hashtags: editedHashtags.split(' ').map(t => t.startsWith('#') ? t : `#${t}`).filter(Boolean)
       }
@@ -69,142 +148,232 @@ export const AIDraftReviewPage = ({
     onApproveAndPublish(record.id, reviewNotes);
   };
 
-  const handleReject = () => {
-    const notes = prompt("Enter reasons or required changes for the researcher:", "Please verify the ice core isotopic baseline depth values.");
-    if (notes) {
-      onRequestChanges(record.id, notes);
+  const handleConfirmReject = (e) => {
+    e.preventDefault();
+    if (rejectFeedback.trim()) {
+      onRequestChanges(record.id, rejectFeedback.trim());
+      setShowRejectForm(false);
     }
   };
 
   const isAlreadyPublished = record.status === 'Published';
+  const isOwnRecord = isAuthor(currentUser, record);
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 space-y-6">
       {/* Top Breadcrumb & Status */}
-      <div className="flex flex-wrap items-center justify-between gap-3">
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 pb-3">
         <button
           onClick={onBackToExplore}
-          className="text-xs font-semibold text-slate-500 hover:text-slate-800 flex items-center gap-1.5"
+          className="text-xs font-semibold text-slate-500 hover:text-slate-800 flex items-center gap-1.5 transition-colors"
         >
-          <Icon name="arrow-left" size={14} /> Back to Search / Records
+          <Icon name="arrow-left" size={13} /> Back to Records Queue
         </button>
 
         <div className="flex items-center gap-2">
-          <span className="text-xs text-slate-500">Record Status:</span>
+          <span className="text-xs text-slate-500 font-medium">Review Status:</span>
           <StatusBadge status={record.status} />
         </div>
       </div>
 
-      {/* Header matching Reference Screenshot */}
-      <div>
-        <div className="flex items-center gap-2 text-xs font-semibold text-blue-700 uppercase tracking-wide">
-          <Icon name="shield-check" size={16} className="text-amber-500" />
-          Mandatory Human Review Gate
-        </div>
-        <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 mt-1">
-          AI Draft (Review)
-        </h1>
-        <p className="text-xs sm:text-sm text-slate-500 mt-1">
-          Here's the AI-generated student explainer and social media caption. Please review, edit if needed, and approve before publishing to the public portal.
-        </p>
-      </div>
-
-      {/* AI Advisory Banner */}
-      <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs">
-        <div className="flex items-center gap-3">
-          <div className="p-2 rounded-lg bg-blue-100 text-blue-700 shrink-0">
-            <Icon name="sparkles" size={18} />
-          </div>
+      {/* Role-Specific Header Banner */}
+      <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-xs space-y-4">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
-            <div className="font-bold text-blue-900">
-              Generated by {record.aiDraft?.model || 'PolarAI-Assist (Advisory Adapter)'}
+            <div className="flex items-center gap-2">
+              <span className={`w-2.5 h-2.5 rounded-full ${isUserResearcher ? 'bg-blue-600' : 'bg-amber-500'}`}></span>
+              <h1 className="text-xl font-bold text-slate-900">
+                {isUserResearcher
+                  ? 'Author AI Draft Inspection & Editing Gate'
+                  : 'Scientific Review & Approval Gate'}
+              </h1>
             </div>
-            <p className="text-slate-600 text-[11px]">
-              AI drafts are non-destructive and cannot overwrite verified scientific records. You are acting as: <strong>{currentUser.name}</strong> ({currentUser.role})
+            <p className="text-xs text-slate-500 mt-1">
+              {isUserResearcher
+                ? 'Inspect and edit the advisory student explainer and outreach pack generated for your submission before final reviewer sign-off.'
+                : 'Verify scientific parameters, review plain-language student summaries, and authorize publication to the national portal.'}
             </p>
           </div>
+
+          <div className="flex items-center gap-2 text-xs text-slate-600 bg-slate-50 p-2.5 rounded-lg border border-slate-200">
+            <span>{isUserResearcher ? 'Author:' : 'Reviewer:'}</span>
+            <strong className="text-slate-900">{currentUser.name}</strong>
+            <span className={`text-[11px] font-semibold px-2 py-0.5 rounded ${
+              isUserResearcher
+                ? 'bg-blue-100 text-blue-800'
+                : 'bg-amber-100 text-amber-800'
+            }`}>
+              {currentUser.role} {isUserResearcher ? '(Author View)' : ''}
+            </span>
+          </div>
         </div>
 
-        <div className="flex items-center gap-2 shrink-0">
-          {!isEditing ? (
-            <button
-              onClick={() => setIsEditing(true)}
-              className="px-3 py-1.5 bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 rounded-lg text-xs font-semibold transition-colors flex items-center gap-1.5 shadow-2xs"
-            >
-              <Icon name="edit" size={13} /> Edit AI Draft
-            </button>
-          ) : (
-            <button
-              onClick={handleSaveEdits}
-              className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-semibold transition-colors flex items-center gap-1.5"
-            >
-              <Icon name="check" size={13} /> Save Edited Draft
-            </button>
-          )}
-        </div>
-      </div>
-
-      {/* Two Column Layout matching Reference Screenshot */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
-        {/* Left Card: Source & Student Explainer */}
-        <div className="bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden flex flex-col">
-          {/* Header Card Strip */}
-          <div className="p-4 bg-slate-50 border-b border-slate-200 flex items-center gap-3">
-            <div className="p-2 rounded-lg bg-blue-100 text-blue-700">
-              <Icon name="file-text" size={20} />
-            </div>
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2">
-                <ContentTypeBadge type={record.contentType} />
-                <RegionBadge region={record.region} />
-              </div>
-              <h3 className="font-bold text-sm text-slate-900 truncate mt-1">
-                {record.title}
-              </h3>
-              <p className="text-[11px] text-slate-400 truncate">
-                {record.expeditionName} • Author: {record.authorName || 'NCPOR Researcher'}
-              </p>
+        {/* Submissions Switcher Strip */}
+        {myAccessibleRecords.length > 1 && (
+          <div className="pt-3 border-t border-slate-100 flex flex-wrap items-center gap-2">
+            <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">
+              {isUserResearcher ? 'My Submissions:' : 'Submissions Queue:'}
+            </span>
+            <div className="flex flex-wrap gap-1.5">
+              {myAccessibleRecords.map((r) => {
+                const isSelected = r.id === record.id;
+                return (
+                  <button
+                    key={r.id}
+                    onClick={() => {
+                      setActiveRecordId(r.id);
+                      if (onSelectRecord) onSelectRecord(r);
+                    }}
+                    className={`text-xs px-2.5 py-1 rounded-md font-medium transition-colors flex items-center gap-1.5 border ${
+                      isSelected
+                        ? 'bg-blue-600 text-white border-blue-600 font-semibold shadow-2xs'
+                        : 'bg-slate-50 hover:bg-slate-100 text-slate-700 border-slate-200'
+                    }`}
+                  >
+                    <span className="truncate max-w-[160px]">{r.title}</span>
+                    <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-bold ${
+                      isSelected ? 'bg-white/20 text-white' : 'bg-slate-200 text-slate-600'
+                    }`}>
+                      {r.status}
+                    </span>
+                  </button>
+                );
+              })}
             </div>
           </div>
+        )}
+      </div>
 
-          <div className="p-6 space-y-6 flex-1">
-            {/* AI Generated Explainer Header */}
-            <div>
-              <div className="flex items-center justify-between mb-2">
-                <h4 className="font-bold text-xs uppercase tracking-wider text-slate-800 flex items-center gap-1.5">
-                  <Icon name="book-open" size={15} className="text-teal-600" />
-                  AI Generated Explainer (For Students & Public)
-                </h4>
-                <span className="text-[10px] bg-teal-50 text-teal-700 px-2 py-0.5 rounded font-medium border border-teal-200">
-                  Plain Language
+      {/* Notice for Changes Requested (if applicable) */}
+      {record.status === 'Changes Requested' && record.aiDraft?.reviewNotes && (
+        <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 flex items-start gap-3">
+          <div className="p-1.5 bg-amber-100 text-amber-800 rounded-lg shrink-0 mt-0.5">
+            <Icon name="x-circle" size={18} />
+          </div>
+          <div className="space-y-1 text-xs">
+            <h4 className="font-bold text-amber-900">Reviewer Feedback / Modifications Requested</h4>
+            <p className="text-amber-800 leading-relaxed font-medium">
+              "{record.aiDraft.reviewNotes}"
+            </p>
+            {isUserResearcher && (
+              <p className="text-amber-700 text-[11px]">
+                You can edit the AI draft text below and click <strong>Save Draft Edits</strong> to update your submission.
+              </p>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Change Request Drawer (Reviewer/Admin only) */}
+      {showRejectForm && isUserStaff && (
+        <div className="bg-rose-50 border border-rose-200 rounded-xl p-5 space-y-3">
+          <div className="flex items-center justify-between">
+            <h3 className="text-xs font-bold text-rose-900 uppercase tracking-wider flex items-center gap-1.5">
+              <Icon name="x-circle" size={15} className="text-rose-600" />
+              Request Modifications from Submitter
+            </h3>
+            <button
+              type="button"
+              onClick={() => setShowRejectForm(false)}
+              className="text-xs text-rose-600 hover:text-rose-800 font-medium"
+            >
+              Cancel
+            </button>
+          </div>
+          <p className="text-xs text-rose-800 leading-relaxed">
+            Specify technical corrections or terminology revisions. The record status will be updated to <strong>Changes Requested</strong>.
+          </p>
+          <form onSubmit={handleConfirmReject} className="space-y-3">
+            <textarea
+              rows={3}
+              required
+              value={rejectFeedback}
+              onChange={(e) => setRejectFeedback(e.target.value)}
+              placeholder="State the required modifications..."
+              className="w-full text-xs p-3 bg-white border border-rose-300 rounded-lg text-slate-800 focus:outline-none focus:ring-1 focus:ring-rose-500"
+            />
+            <div className="flex items-center justify-end gap-2">
+              <button
+                type="button"
+                onClick={() => setShowRejectForm(false)}
+                className="px-3 py-1.5 bg-white border border-slate-300 text-slate-700 rounded-lg text-xs font-medium"
+              >
+                Dismiss
+              </button>
+              <button
+                type="submit"
+                className="px-4 py-1.5 bg-rose-600 hover:bg-rose-700 text-white rounded-lg text-xs font-bold transition-colors"
+              >
+                Send Feedback to Researcher
+              </button>
+            </div>
+          </form>
+        </div>
+      )}
+
+      {/* Two Column Layout: Student Explainer (Left) & Outreach Pack (Right) */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
+        {/* Left Column: Scientific Source & Student Explainer */}
+        <div className="bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden flex flex-col">
+          {/* Header */}
+          <div className="p-4 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <ContentTypeBadge type={record.contentType} />
+              <RegionBadge region={record.region} />
+            </div>
+            <span className="text-[11px] text-slate-500 font-medium">
+              Submitter: <strong>{record.authorName || 'NCPOR Scientist'}</strong> {isOwnRecord ? '(You)' : ''}
+            </span>
+          </div>
+
+          <div className="p-5 space-y-5 flex-1">
+            {/* Record Title & Expedition */}
+            <div className="space-y-1">
+              <h2 className="text-sm sm:text-base font-bold text-slate-900 leading-snug">
+                {record.title}
+              </h2>
+              <p className="text-xs text-slate-500">
+                {record.expeditionName} • {record.location}
+              </p>
+            </div>
+
+            {/* Plain Language Explainer Box */}
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
+                  <Icon name="book-open" size={14} className="text-blue-600" />
+                  Plain-Language Summary (Student View)
+                </h3>
+                <span className="text-[10px] bg-blue-50 text-blue-700 px-2 py-0.5 rounded font-medium border border-blue-200">
+                  Advisory Draft
                 </span>
               </div>
 
               {isEditing ? (
-                <div className="space-y-3">
+                <div className="space-y-3 bg-slate-50 p-3 rounded-lg border border-slate-200">
                   <div>
-                    <label className="block text-[11px] font-semibold text-slate-600 mb-1">Intro Summary</label>
+                    <label className="block text-[11px] font-semibold text-slate-600 mb-1">Introductory Hook</label>
                     <textarea
                       rows={2}
                       value={editedExplainerIntro}
                       onChange={(e) => setEditedExplainerIntro(e.target.value)}
-                      className="w-full text-xs p-2 bg-slate-50 border border-slate-300 rounded text-slate-800 focus:outline-none"
+                      className="w-full text-xs p-2 bg-white border border-slate-300 rounded text-slate-800 focus:outline-none"
                     />
                   </div>
                   <div>
-                    <label className="block text-[11px] font-semibold text-slate-600 mb-1">Detailed Explanation Body</label>
+                    <label className="block text-[11px] font-semibold text-slate-600 mb-1">Full Explainer Body</label>
                     <textarea
                       rows={5}
                       value={editedExplainerBody}
                       onChange={(e) => setEditedExplainerBody(e.target.value)}
-                      className="w-full text-xs p-2 bg-slate-50 border border-slate-300 rounded text-slate-800 focus:outline-none"
+                      className="w-full text-xs p-2 bg-white border border-slate-300 rounded text-slate-800 focus:outline-none"
                     />
                   </div>
                 </div>
               ) : (
                 <div className="p-4 bg-slate-50 rounded-lg border border-slate-200 text-xs text-slate-700 space-y-2 leading-relaxed">
                   {record.aiDraft?.studentExplainer?.intro && (
-                    <p className="font-medium text-slate-900 italic border-l-2 border-teal-500 pl-2">
+                    <p className="font-semibold text-slate-900 italic border-l-2 border-blue-500 pl-2.5">
                       "{record.aiDraft.studentExplainer.intro}"
                     </p>
                   )}
@@ -215,171 +384,273 @@ export const AIDraftReviewPage = ({
               )}
             </div>
 
-            {/* Key Takeaways Preview */}
+            {/* Key Takeaways */}
             <div className="space-y-2">
-              <h5 className="font-bold text-xs text-slate-800 flex items-center gap-1.5">
+              <h4 className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
                 <Icon name="check-circle" size={14} className="text-emerald-600" />
-                Key Takeaways Draft
-              </h5>
+                Key Scientific Takeaways
+              </h4>
               <ul className="space-y-1.5 text-xs text-slate-600">
                 {(record.aiDraft?.studentExplainer?.keyTakeaways || [
-                  "Ice cores show past temperatures and atmospheric gas composition.",
-                  "Help scientists predict future climate changes and polar trends.",
-                  "Important for global sea-level and monsoon predictions."
+                  "Ice core layers preserve ancient atmospheric data and past temperature trends.",
+                  "Crucial for predicting future climate changes and global sea-level rise.",
+                  "Indian polar data links high-latitude changes to the Indian Monsoon."
                 ]).map((k, idx) => (
-                  <li key={idx} className="flex items-start gap-2 bg-emerald-50/50 p-2 rounded border border-emerald-100/60">
+                  <li key={idx} className="flex items-start gap-2 bg-slate-50 p-2.5 rounded border border-slate-200">
                     <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 mt-1.5 shrink-0"></span>
                     <span>{k}</span>
                   </li>
                 ))}
               </ul>
             </div>
-
-            {/* Reviewer Note Input */}
-            <div className="space-y-1.5 pt-2 border-t border-slate-100">
-              <label className="block text-xs font-bold text-slate-700">
-                Reviewer Audit Note / Sign-off Remarks
-              </label>
-              <input
-                type="text"
-                value={reviewNotes}
-                onChange={(e) => setReviewNotes(e.target.value)}
-                placeholder="Enter review remarks (saved into immutable audit log)..."
-                className="w-full text-xs p-2.5 bg-white border border-slate-300 rounded-lg text-slate-800 focus:outline-none"
-              />
-            </div>
-          </div>
-
-          {/* Action Buttons matching Reference Screenshot */}
-          <div className="p-4 bg-slate-50 border-t border-slate-200 flex flex-wrap items-center justify-between gap-3">
-            <button
-              onClick={() => setIsEditing(!isEditing)}
-              className="px-4 py-2 bg-white border border-slate-300 hover:bg-slate-100 text-slate-700 rounded-lg text-xs font-semibold transition-colors flex items-center gap-1.5"
-            >
-              <Icon name="edit" size={14} />
-              {isEditing ? "Cancel Edit" : "Edit Draft"}
-            </button>
-
-            <div className="flex items-center gap-2">
-              <button
-                onClick={handleReject}
-                className="px-3.5 py-2 bg-white border border-rose-300 text-rose-700 hover:bg-rose-50 rounded-lg text-xs font-semibold transition-colors flex items-center gap-1"
-              >
-                <Icon name="x-circle" size={14} />
-                Request Changes
-              </button>
-
-              <button
-                onClick={handleApprove}
-                className="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-bold shadow-xs transition-colors flex items-center gap-1.5"
-              >
-                <Icon name="shield-check" size={15} />
-                {isAlreadyPublished ? "Re-Approve & Save" : "Approve & Publish"}
-              </button>
-            </div>
           </div>
         </div>
 
-        {/* Right Card: AI Generated Social Media Caption */}
-        <div className="bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden flex flex-col">
-          <div className="p-4 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
-            <h3 className="font-bold text-xs uppercase tracking-wider text-slate-800 flex items-center gap-1.5">
-              <Icon name="share" size={15} className="text-purple-600" />
-              AI Generated Social Media Caption
-            </h3>
-            <span className="text-[10px] bg-purple-50 text-purple-700 px-2 py-0.5 rounded font-medium border border-purple-200">
-              Ready-to-Post Pack
-            </span>
-          </div>
+        {/* Right Column: Outreach Pack & Decision Strip */}
+        <div className="space-y-6">
+          {/* Outreach Media Card */}
+          <div className="bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden">
+            <div className="p-4 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
+              <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
+                <Icon name="share" size={14} className="text-purple-600" />
+                Public Outreach & Social Pack
+              </h3>
+              <span className="text-[10px] bg-purple-50 text-purple-700 px-2 py-0.5 rounded font-medium border border-purple-200">
+                Official Media Kit
+              </span>
+            </div>
 
-          <div className="p-6 space-y-5 flex-1">
-            {/* Social Post Preview Box */}
-            <div className="border border-slate-200 rounded-xl p-4 bg-white shadow-2xs space-y-3">
-              {/* Account Header */}
-              <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold text-xs">
-                  <Icon name="polar-logo" className="w-5 h-5" />
-                </div>
-                <div>
-                  <div className="flex items-center gap-1">
-                    <span className="font-bold text-xs text-slate-900">PolarSetu India</span>
-                    <span className="text-[10px] text-blue-500 font-semibold">✓</span>
+            <div className="p-5 space-y-4">
+              {/* Social Preview */}
+              <div className="border border-slate-200 rounded-xl p-4 bg-white space-y-3 shadow-2xs">
+                <div className="flex items-center gap-2">
+                  <div className="w-7 h-7 rounded-full bg-blue-600 flex items-center justify-center text-white text-[10px] font-bold">
+                    PS
                   </div>
-                  <span className="text-[10px] text-slate-400">@PolarSetu • Official Outreach</span>
+                  <div>
+                    <div className="flex items-center gap-1">
+                      <span className="font-bold text-xs text-slate-900">PolarSetu India</span>
+                      <span className="text-[10px] text-blue-500 font-bold">✓</span>
+                    </div>
+                    <span className="text-[10px] text-slate-400">@PolarSetu • Official Outreach Channel</span>
+                  </div>
+                </div>
+
+                {isEditing ? (
+                  <div className="space-y-2 bg-slate-50 p-3 rounded-lg border border-slate-200">
+                    <div>
+                      <label className="block text-[11px] font-semibold text-slate-600 mb-1">Headline Hook</label>
+                      <input
+                        type="text"
+                        value={editedHook}
+                        onChange={(e) => setEditedHook(e.target.value)}
+                        className="w-full text-xs p-2 bg-white border border-slate-300 rounded text-slate-800 focus:outline-none"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[11px] font-semibold text-slate-600 mb-1">Post Caption Body</label>
+                      <textarea
+                        rows={3}
+                        value={editedCaption}
+                        onChange={(e) => setEditedCaption(e.target.value)}
+                        className="w-full text-xs p-2 bg-white border border-slate-300 rounded text-slate-800 focus:outline-none"
+                      />
+                    </div>
+                  </div>
+                ) : (
+                  <div className="text-xs text-slate-800 space-y-1.5 leading-relaxed">
+                    <p className="font-bold text-slate-900">
+                      {record.aiDraft?.socialCaption?.hook || "❄️ Polar Science Discovery Update"}
+                    </p>
+                    <p className="text-slate-700">
+                      {record.aiDraft?.socialCaption?.body || record.aiDraft?.summary || record.description}
+                    </p>
+                    <p className="text-blue-600 font-medium text-[11px]">
+                      {record.aiDraft?.socialCaption?.hashtags?.join(' ') || "#PolarScience #Antarctica #NCPOR #MoES"}
+                    </p>
+                  </div>
+                )}
+
+                {/* Media Image */}
+                <div className="rounded-lg overflow-hidden border border-slate-200 bg-slate-100 max-h-40">
+                  <img
+                    src={record.thumbnail}
+                    alt={record.title}
+                    className="w-full h-40 object-cover"
+                  />
                 </div>
               </div>
 
-              {/* Caption Content */}
-              {isEditing ? (
-                <div className="space-y-2">
-                  <label className="block text-[11px] font-semibold text-slate-600">Edit Social Caption</label>
-                  <textarea
-                    rows={4}
-                    value={editedCaption}
-                    onChange={(e) => setEditedCaption(e.target.value)}
-                    className="w-full text-xs p-2 bg-slate-50 border border-slate-300 rounded text-slate-800 focus:outline-none"
-                  />
-                  <input
-                    type="text"
-                    value={editedHashtags}
-                    onChange={(e) => setEditedHashtags(e.target.value)}
-                    className="w-full text-xs p-2 bg-slate-50 border border-slate-300 rounded text-slate-800 focus:outline-none"
-                    placeholder="#Hashtags"
-                  />
-                </div>
-              ) : (
-                <div className="text-xs text-slate-800 space-y-2 leading-relaxed">
-                  <p className="font-semibold text-blue-900">
-                    {record.aiDraft?.socialCaption?.hook || "🧊 Ice tells a story!"}
+              {/* Reviewer Verification Checklist (Shown to Reviewer/Admin only) */}
+              {isUserStaff && (
+                <div className="bg-slate-50 p-3.5 rounded-lg border border-slate-200 space-y-2 text-xs">
+                  <p className="font-bold text-slate-800 uppercase text-[10px] tracking-wider">
+                    Reviewer Verification Checklist:
                   </p>
-                  <p className="text-slate-700">
-                    {record.aiDraft?.socialCaption?.body || record.aiDraft?.summary || record.description}
-                  </p>
-                  <div className="text-blue-600 font-medium text-xs">
-                    {record.aiDraft?.socialCaption?.hashtags?.join(' ') || "#PolarScience #Antarctica #ClimateResearch #NCPOR"}
+                  <div className="space-y-1.5">
+                    <label className="flex items-center gap-2 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={checkedData}
+                        onChange={(e) => setCheckedData(e.target.checked)}
+                        className="rounded text-blue-600"
+                      />
+                      <span className="text-slate-700">Scientific metadata & expedition station parameters verified</span>
+                    </label>
+                    <label className="flex items-center gap-2 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={checkedLanguage}
+                        onChange={(e) => setCheckedLanguage(e.target.checked)}
+                        className="rounded text-blue-600"
+                      />
+                      <span className="text-slate-700">Plain-language summary is accurate and age-appropriate for students</span>
+                    </label>
+                    <label className="flex items-center gap-2 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={checkedCitation}
+                        onChange={(e) => setCheckedCitation(e.target.checked)}
+                        className="rounded text-blue-600"
+                      />
+                      <span className="text-slate-700">DOI / NPDC dataset linkage and authorship confirmed</span>
+                    </label>
                   </div>
                 </div>
               )}
+            </div>
+          </div>
 
-              {/* Image Preview */}
-              <div className="rounded-lg overflow-hidden border border-slate-200 bg-slate-100 max-h-48">
-                <img
-                  src={record.thumbnail}
-                  alt={record.title}
-                  className="w-full h-48 object-cover"
+          {/* Decision Box: Distinct for Reviewer/Admin vs Researcher */}
+          {isUserStaff ? (
+            /* Reviewer / Admin Decision Box */
+            <div className="bg-white rounded-xl border border-slate-200 shadow-xs p-5 space-y-4">
+              <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider">
+                Reviewer Decision & Audit Sign-off
+              </h3>
+
+              <div className="space-y-1.5">
+                <label className="block text-[11px] font-semibold text-slate-700">
+                  Audit Trail Sign-off Remarks
+                </label>
+                <input
+                  type="text"
+                  value={reviewNotes}
+                  onChange={(e) => setReviewNotes(e.target.value)}
+                  placeholder="Enter verification notes..."
+                  className="w-full text-xs p-2.5 bg-white border border-slate-300 rounded-lg text-slate-800 focus:outline-none focus:ring-1 focus:ring-blue-500"
                 />
               </div>
 
-              <div className="text-[10px] text-slate-400 flex items-center justify-between pt-1">
-                <span>Alt Text: {record.aiDraft?.socialCaption?.altText?.slice(0, 50)}...</span>
-                <span>Auto-drafted • Editable</span>
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-2 border-t border-slate-100">
+                <div className="flex items-center gap-2 w-full sm:w-auto">
+                  {isEditing ? (
+                    <button
+                      type="button"
+                      onClick={handleSaveEdits}
+                      className="px-3.5 py-2 bg-blue-600 text-white hover:bg-blue-700 rounded-lg text-xs font-semibold flex items-center gap-1 transition-colors"
+                    >
+                      <Icon name="check-circle" size={13} />
+                      Save Edits
+                    </button>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => setIsEditing(true)}
+                      className="px-3.5 py-2 bg-white border border-slate-300 hover:bg-slate-100 text-slate-700 rounded-lg text-xs font-semibold flex items-center gap-1 transition-colors"
+                    >
+                      <Icon name="edit" size={13} />
+                      Edit Text
+                    </button>
+                  )}
+
+                  <button
+                    type="button"
+                    onClick={() => setShowRejectForm(true)}
+                    className="px-3.5 py-2 bg-white border border-rose-300 text-rose-700 hover:bg-rose-50 rounded-lg text-xs font-semibold flex items-center gap-1 transition-colors"
+                  >
+                    <Icon name="x-circle" size={13} />
+                    Request Changes
+                  </button>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={handleApprove}
+                  disabled={!checkedData || !checkedLanguage}
+                  className="w-full sm:w-auto px-5 py-2 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white rounded-lg text-xs font-bold shadow-xs flex items-center justify-center gap-1.5 transition-colors"
+                >
+                  <Icon name="shield-check" size={15} />
+                  {isAlreadyPublished ? "Re-Verify & Save" : "Approve & Publish to Repository"}
+                </button>
               </div>
             </div>
-
-            {/* Quick Actions if Published */}
-            {isAlreadyPublished && (
-              <div className="p-3.5 bg-emerald-50 rounded-lg border border-emerald-200 space-y-2">
-                <div className="text-xs font-bold text-emerald-900 flex items-center gap-1.5">
-                  <Icon name="check-circle" size={15} />
-                  Record is Published & Active
+          ) : (
+            /* Researcher / Author Polish & Save Box */
+            <div className="bg-white rounded-xl border border-slate-200 shadow-xs p-5 space-y-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider">
+                    Author Draft Management
+                  </h3>
+                  <p className="text-[11px] text-slate-500 mt-0.5">
+                    You can polish the AI-generated plain-language summary and social text for your submission.
+                  </p>
                 </div>
-                <div className="flex items-center gap-2 pt-1">
-                  <button
-                    onClick={() => onOpenStudentView(record)}
-                    className="px-3 py-1.5 bg-teal-600 hover:bg-teal-700 text-white rounded text-xs font-medium"
-                  >
-                    View Student Explainer
-                  </button>
-                  <button
-                    onClick={() => onOpenOutreach(record)}
-                    className="px-3 py-1.5 bg-purple-600 hover:bg-purple-700 text-white rounded text-xs font-medium"
-                  >
-                    Open Outreach Studio
-                  </button>
-                </div>
+                <StatusBadge status={record.status} />
               </div>
-            )}
-          </div>
+
+              {/* Status Note */}
+              <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg text-xs text-blue-900 space-y-1">
+                <p className="font-semibold flex items-center gap-1.5">
+                  <Icon name="shield-check" size={14} className="text-blue-600" />
+                  Review Gate Safety Note
+                </p>
+                <p className="text-[11px] text-blue-800 leading-relaxed">
+                  Final approval and publication to the public repository is authorized by designated scientific reviewers (NCPOR Reviewers / Admins).
+                </p>
+              </div>
+
+              <div className="flex items-center justify-between gap-3 pt-2 border-t border-slate-100">
+                {isEditing ? (
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setIsEditing(false)}
+                      className="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-semibold transition-colors"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleSaveEdits}
+                      className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-bold transition-colors flex items-center gap-1.5 shadow-xs"
+                    >
+                      <Icon name="check-circle" size={14} />
+                      Save Draft Changes
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => setIsEditing(true)}
+                    className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-bold transition-colors flex items-center gap-1.5 shadow-xs"
+                  >
+                    <Icon name="edit" size={14} />
+                    Edit AI Draft Text
+                  </button>
+                )}
+
+                <button
+                  type="button"
+                  onClick={onBackToExplore}
+                  className="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-semibold transition-colors"
+                >
+                  Back to Explore
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>

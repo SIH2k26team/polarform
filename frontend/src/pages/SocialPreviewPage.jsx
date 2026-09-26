@@ -168,9 +168,8 @@ export const SocialPreviewPage = ({
             <div className="pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
               <button
                 onClick={handleLikeToggle}
-                className={`flex items-center gap-1.5 transition-colors ${
-                  isLiked ? 'text-rose-600 font-bold' : 'hover:text-rose-600'
-                }`}
+                className={`flex items-center gap-1.5 transition-colors ${isLiked ? 'text-rose-600 font-bold' : 'hover:text-rose-600'
+                  }`}
               >
                 <Icon name="heart" size={16} />
                 <span>{likes}</span>
@@ -219,11 +218,10 @@ export const SocialPreviewPage = ({
 
               <button
                 onClick={handleCopyText}
-                className={`w-full py-2.5 px-4 rounded-lg text-xs font-semibold transition-colors flex items-center justify-center gap-2 border ${
-                  copied
+                className={`w-full py-2.5 px-4 rounded-lg text-xs font-semibold transition-colors flex items-center justify-center gap-2 border ${copied
                     ? 'bg-emerald-50 text-emerald-700 border-emerald-300'
                     : 'bg-white hover:bg-slate-50 text-slate-800 border-slate-300'
-                }`}
+                  }`}
               >
                 <Icon name={copied ? 'check' : 'copy'} size={15} />
                 {copied ? "Copied Post Text to Clipboard!" : "Copy Post Text"}

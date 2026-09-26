@@ -6,15 +6,13 @@ export const StatusBadge = ({ status, className = "" }) => {
   switch (status) {
     case 'Published':
       return (
-        <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-200 ${className}`}>
-          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+        <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium text-emerald-700 ${className}`}>
           Published
         </span>
       );
     case 'Under Review':
       return (
-        <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-50 text-amber-700 border border-amber-200 ${className}`}>
-          <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span>
+        <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium text-amber-700 ${className}`}>
           Under Review
         </span>
       );

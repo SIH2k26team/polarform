@@ -902,10 +902,10 @@ export const DEMO_USERS = [
   },
   {
     id: "user-4",
-    name: "Aarav Gupta",
+    name: "Aarav Gupta (Public / Student)",
     email: "aarav.student@delhiuniv.ac.in",
     role: "Public / Student",
-    designation: "B.Sc. Earth Sciences Student",
+    designation: "Student / Teacher / Public Visitor (No Login Required)",
     avatar: "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&w=200&q=80"
   }
 ];
