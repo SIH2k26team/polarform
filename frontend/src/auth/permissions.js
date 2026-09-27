@@ -1,5 +1,5 @@
 /**
- * PolarSetu — Frontend Role-Based Access Control (RBAC)
+ * Polar Nexus — Frontend Role-Based Access Control (RBAC)
  *
  * Single source of truth for who can do what.
  * All pages and components import from here.

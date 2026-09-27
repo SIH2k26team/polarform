@@ -18,7 +18,7 @@ export const DashboardPage = ({
 
   const displayRecords = visibleRecords || records;
   const totalCount = displayRecords.length;
-  
+
   // Filter records created by current user
   const myUploads = records.filter(r => isAuthor(currentUser, r));
   const myPendingRecords = myUploads.filter(r => r.status === 'Under Review' || r.status === 'Changes Requested' || r.status === 'Draft');
@@ -88,8 +88,8 @@ export const DashboardPage = ({
               key={item.id}
               onClick={() => setActiveTab(item.id)}
               className={`w-full text-left px-3.5 py-2.5 rounded-lg text-xs font-semibold flex items-center justify-between transition-colors ${activeTab === item.id
-                  ? 'bg-blue-50 text-blue-700 font-bold'
-                  : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
+                ? 'bg-blue-50 text-blue-700 font-bold'
+                : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
                 }`}
             >
               <div className="flex items-center gap-2.5">
@@ -119,7 +119,7 @@ export const DashboardPage = ({
                 <p className="text-2xl sm:text-3xl font-bold text-slate-900 mt-1">
                   {userIsResearcher ? myUploads.length : totalCount}
                 </p>
-                <p className="text-[11px] text-slate-400 mt-0.5">Indexed in PolarSetu</p>
+                <p className="text-[11px] text-slate-400 mt-0.5">Indexed in Polar Nexus</p>
               </div>
               <div className="w-11 h-11 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center">
                 <Icon name="database" size={22} />
@@ -132,7 +132,7 @@ export const DashboardPage = ({
                 <p className="text-xs font-semibold text-slate-500">
                   {userIsResearcher ? 'Awaiting Review' : 'Pending Review'}
                 </p>
-                <p className="text-2xl sm:text-3xl font-bold text-amber-600 mt-1">{pendingRecords.length}</p>
+                <p className="text-2xl sm:text-3xl font-bold mt-1">{pendingRecords.length}</p>
                 <p className="text-[11px] text-slate-400 mt-0.5">
                   {userIsResearcher ? 'In review queue' : 'Awaiting human approval'}
                 </p>
@@ -146,7 +146,7 @@ export const DashboardPage = ({
             <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-xs flex items-center justify-between">
               <div>
                 <p className="text-xs font-semibold text-slate-500">Published</p>
-                <p className="text-2xl sm:text-3xl font-bold text-emerald-600 mt-1">{publishedRecords.length}</p>
+                <p className="text-2xl sm:text-3xl font-bold mt-1">{publishedRecords.length}</p>
                 <p className="text-[11px] text-slate-400 mt-0.5">Active on public portal</p>
               </div>
               <div className="w-11 h-11 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center">
@@ -210,7 +210,7 @@ export const DashboardPage = ({
                           {canAccessReview(currentUser, rec) && (rec.status === 'Under Review' || rec.status === 'Changes Requested') ? (
                             <button
                               onClick={() => onOpenReview(rec)}
-                              className="px-2.5 py-1 bg-amber-500 hover:bg-amber-600 text-white rounded text-xs font-semibold inline-flex items-center gap-1"
+                              className="px-2.5 py-1 bg-amber-500 text-white rounded text-xs font-semibold inline-flex items-center gap-1"
                             >
                               <Icon name="shield-check" size={12} />
                               {userIsResearcher ? 'AI Draft' : 'Review'}
@@ -281,7 +281,7 @@ export const DashboardPage = ({
 
                       <button
                         onClick={() => onOpenReview(rec)}
-                        className="px-4 py-2 bg-amber-500 text-white rounded-lg text-xs font-bold shrink-0 flex items-center gap-1.5 shadow-2xs hover:bg-amber-600 transition-colors"
+                        className="px-4 py-2 bg-amber-500 text-white rounded-lg text-xs font-bold shrink-0 flex items-center gap-1.5 shadow-2xs transition-colors"
                       >
                         <Icon name="shield-check" size={14} />
                         {userIsResearcher ? 'Inspect / Edit AI Draft' : 'Review & Approve'}
@@ -313,14 +313,14 @@ export const DashboardPage = ({
                         <StatusBadge status={rec.status} />
                         <button
                           onClick={() => onOpenReview(rec)}
-                          className="px-2.5 py-1 bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200 rounded text-xs font-semibold flex items-center gap-1 transition-colors"
+                          className="px-2.5 py-1 bg-amber-50  text-amber-800 border border-amber-200 rounded text-xs font-semibold flex items-center gap-1 transition-colors"
                         >
                           <Icon name="shield-check" size={12} />
                           AI Draft
                         </button>
                         <button
                           onClick={() => onSelectRecord(rec)}
-                          className="px-2.5 py-1 bg-slate-100 hover:bg-blue-600 hover:text-white rounded text-xs font-medium text-slate-700 transition-colors"
+                          className="px-2.5 py-1 bg-blue-600 text-white rounded text-xs font-medium  transition-colors"
                         >
                           View
                         </button>
@@ -356,8 +356,8 @@ export const DashboardPage = ({
                     <div className="flex flex-wrap items-center justify-between gap-2">
                       <div className="flex items-center gap-2">
                         <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${log.action === 'PUBLISHED' ? 'bg-emerald-100 text-emerald-800' :
-                            log.action === 'AI_DRAFTED' ? 'bg-blue-100 text-blue-800' :
-                              'bg-slate-100 text-slate-800'
+                          log.action === 'AI_DRAFTED' ? 'bg-blue-100 text-blue-800' :
+                            'bg-slate-100 text-slate-800'
                           }`}>
                           {log.action}
                         </span>

@@ -14,7 +14,7 @@ export const RecordChatbot = ({ record }) => {
         {
           id: 'welcome-1',
           sender: 'bot',
-          text: `Hello! I'm your PolarSetu AI Assistant. Ask me anything about **${record.title}**!`,
+          text: `Hello! I'm your Polar Nexus AI Assistant. Ask me anything about **${record.title}**!`,
           timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
         }
       ]);

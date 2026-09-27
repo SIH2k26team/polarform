@@ -1,4 +1,4 @@
-// PolarSetu Mock Data Repository - Indian Polar & Southern Ocean Research
+// Polar Nexus Mock Data Repository - Indian Polar & Southern Ocean Research
 // Realistic demo records based on NCPOR (National Centre for Polar and Ocean Research, MoES)
 
 export const INITIAL_EXPEDITIONS = [
@@ -145,7 +145,7 @@ export const INITIAL_RECORDS = [
     linkedReportsCount: 1,
     linkedVideosCount: 1,
     linkedScientistsCount: 3,
-    
+
     // Core AI Draft Data (Stored separately, human-reviewed)
     aiDraft: {
       generatedAt: "2023-03-13T10:30:00Z",
@@ -153,9 +153,9 @@ export const INITIAL_RECORDS = [
       reviewedBy: "Dr. P. Sunitha (Senior Reviewer)",
       reviewDate: "14 Mar 2023, 16:45 IST",
       reviewNotes: "Verified isotope terminology and checked summary against technical log. Approved for public portal and educational outreach.",
-      
+
       summary: "During the 42nd ISEA, Indian scientists drilled a 102-meter ice core in East Antarctica. The ice layers preserve 450 years of atmospheric history, revealing past temperatures, oceanic storm tracks, and recent polar warming signals.",
-      
+
       studentExplainer: {
         title: "How Ice Cores Help Us Understand Climate Change",
         intro: "Ice cores are like time capsules frozen in deep Antarctic snow. Every year, falling snow traps tiny pockets of ancient air, dust, and volcanic ash. When compressed into solid ice, these layers create a chronological diary of Earth's atmosphere stretching back centuries.",
@@ -171,7 +171,7 @@ export const INITIAL_RECORDS = [
           { term: "Firn", definition: "Granular, partially compacted snow that is intermediate between fresh snow and glacial ice." }
         ]
       },
-      
+
       socialCaption: {
         hook: "🧊 Ice tells a story that goes back centuries!",
         body: "Scientists from @NCPOR_India during the 42nd Indian Antarctic Expedition extracted a 102m ice core at Princess Elizabeth Land. These ancient layers hold vital clues about Earth's past climate and help us forecast future weather patterns.",
@@ -180,7 +180,7 @@ export const INITIAL_RECORDS = [
       }
     }
   },
-  
+
   {
     id: "rec-002",
     title: "Glacial Melt & Surface Mass Balance Dataset — Schirmacher Oasis",
@@ -209,7 +209,7 @@ export const INITIAL_RECORDS = [
     linkedReportsCount: 2,
     linkedVideosCount: 0,
     linkedScientistsCount: 2,
-    
+
     aiDraft: {
       generatedAt: "2022-02-18T14:15:00Z",
       model: "PolarAI-Assist v1.2 (Advisory)",
@@ -265,7 +265,7 @@ export const INITIAL_RECORDS = [
     linkedReportsCount: 1,
     linkedVideosCount: 2,
     linkedScientistsCount: 2,
-    
+
     aiDraft: {
       generatedAt: "2023-03-05T09:00:00Z",
       model: "PolarAI-Assist v1.2 (Advisory)",
@@ -517,62 +517,6 @@ export const INITIAL_RECORDS = [
         body: "New research from Lake Priyadarshini at India's Maitri station reveals novel cold-adapted bacterial communities thriving in sub-zero waters. A peek into how life survives extreme conditions!",
         hashtags: ["#Antarctica", "#Microbiology", "#LakePriyadarshini", "#MaitriStation", "#Extremophiles", "#NCPOR"],
         altText: "Scientific sampling equipment on frozen surface of an Antarctic lake with mountains behind."
-      }
-    }
-  },
-
-  {
-    id: "rec-008",
-    title: "Marine Microplastics Distribution in Southern Ocean Waters (40°S–65°S)",
-    contentType: "Report",
-    expeditionId: "exp-soe-11",
-    expeditionName: "11th Indian Southern Ocean Expedition (SOE-11)",
-    region: "Southern Ocean",
-    location: "Southern Ocean Transect",
-    date: "14 Jan 2021",
-    publishedDate: null,
-    authorId: "sci-3",
-    authorName: "Dr. Anand Vardhan",
-    institution: "NCPOR Oceanography Division",
-    status: "Under Review",
-    doi: "10.1016/j.marpolbul.2021.112340",
-    isMock: true,
-    thumbnail: "https://images.unsplash.com/photo-1544551763-77ef2d0cf967?auto=format&fit=crop&w=800&q=80",
-    tags: ["Microplastics", "Southern Ocean", "Pollution", "Marine Conservation", "SOE-11"],
-    description: "Manta trawl surveys quantifying synthetic polymer particle concentrations in the water column across the Antarctic Circumpolar Current.",
-    abstract: "Evaluation of synthetic microfiber and fragment abundance. Microplastics were detected even in high-latitude Southern Ocean waters, primarily transported by circum-Antarctic currents.",
-    linkedPhotosCount: 2,
-    linkedDatasetsCount: 1,
-    linkedReportsCount: 1,
-    linkedVideosCount: 0,
-    linkedScientistsCount: 2,
-
-    aiDraft: {
-      generatedAt: "2021-01-15T09:45:00Z",
-      model: "PolarAI-Assist v1.2 (Advisory)",
-      reviewedBy: null,
-      reviewDate: null,
-      reviewNotes: "Pending scientific fact-check by Lead Scientist before approval.",
-      summary: "First baseline survey from an Indian expedition measuring plastic particle pollution in remote waters of the Southern Ocean.",
-      studentExplainer: {
-        title: "Even Remote Polar Seas Have Plastic Traces",
-        intro: "The Southern Ocean is considered one of the most untouched wilderness areas on Earth, but our everyday plastics are finding their way there.",
-        bodyText: "Using fine-mesh surface nets during the 11th Indian Southern Ocean Expedition, scientists gathered water samples and discovered microscopic synthetic fibers. This research shows why reducing plastic use anywhere in the world protects wildlife everywhere.",
-        keyTakeaways: [
-          "Microplastics are tiny pieces of plastic smaller than 5 millimeters.",
-          "Ocean currents carry plastic waste across thousands of kilometers into remote polar zones.",
-          "Understanding microplastic density helps protect krill, penguins, and marine mammals."
-        ],
-        glossary: [
-          { term: "Microplastics", definition: "Small plastic particles less than 5mm in diameter resulting from commercial product development and breakdown of larger plastics." },
-          { term: "Manta Trawl", definition: "A specialized surface net used to sample microplastics floating on the ocean's surface." }
-        ]
-      },
-      socialCaption: {
-        hook: "⚠️ Microplastics detected in the pristine Southern Ocean.",
-        body: "Surveys conducted during the 11th Indian Southern Ocean Expedition confirm synthetic plastic fragments reaching polar waters. Protecting our oceans requires global action!",
-        hashtags: ["#MarinePollution", "#SouthernOcean", "#OceanConservation", "#Microplastics", "#NCPOR", "#SaveOurSeas"],
-        altText: "Marine scientists deploying a manta trawl net into deep ocean waters from the deck of a research vessel."
       }
     }
   },

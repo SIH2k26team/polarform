@@ -224,7 +224,7 @@ export const RecordDetailsPage = ({
                     </span>
                   </div>
                   <p className="text-slate-600 text-xs">
-                    This scientific dataset is indexed in the National Polar Data Centre (NPDC). PolarSetu provides discovery and links to the dataset record.
+                    This scientific dataset is indexed in the National Polar Data Centre (NPDC). Polar Nexus provides discovery and links to the dataset record.
                   </p>
                   <div className="pt-2 flex items-center gap-3">
                     <a

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Icon } from './Icon';
 import { RoleBadge } from './AccessDenied';
 import { DEMO_USERS } from '../data/mockData';
@@ -12,6 +12,17 @@ export const Navbar = ({
   pendingReviewCount = 0
 }) => {
   const [showUserMenu, setShowUserMenu] = useState(false);
+  const dropdownRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setShowUserMenu(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   // ── Build nav links based on current user's role ──────────────────────────
   const allLinks = [
@@ -57,8 +68,8 @@ export const Navbar = ({
   const navLinks = activePage === 'home'
     ? allLinks.filter(link => ['home', 'explore', 'about'].includes(link.id))
     : allLinks.filter(link =>
-        link.permission === null || can(currentUser, link.permission)
-      );
+      link.permission === null || can(currentUser, link.permission)
+    );
 
   return (
     <header className="sticky top-0 z-40 bg-white border-b border-slate-200 shadow-xs">
@@ -75,7 +86,7 @@ export const Navbar = ({
                 <Icon name="polar-logo" className="w-7 h-7" />
               </div>
               <div>
-                <span className="font-bold text-xl tracking-tight text-slate-900">PolarSetu</span>
+                <span className="font-bold text-xl tracking-tight text-slate-900">Polar Nexus</span>
                 <p className="text-[11px] text-slate-500 hidden sm:block leading-none">
                   Unified Indian Polar Science Knowledge Portal
                 </p>
@@ -93,7 +104,7 @@ export const Navbar = ({
                     className={`px-3 py-2 rounded-md text-sm font-medium transition-colors flex items-center gap-1.5 relative ${isActive
                       ? 'text-blue-700 bg-blue-50/80 font-semibold'
                       : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
-                    }`}
+                      }`}
                   >
                     {link.label}
                     {link.badge && (
@@ -120,7 +131,7 @@ export const Navbar = ({
             ) : (
               <>
                 {/* User Menu */}
-                <div className="relative">
+                <div className="relative" ref={dropdownRef}>
                   <button
                     onClick={() => setShowUserMenu(!showUserMenu)}
                     className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-slate-200 bg-slate-50 hover:bg-slate-100 text-left transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500/20"
@@ -162,36 +173,7 @@ export const Navbar = ({
                         </div>
                       </div>
 
-                      {/* Role capability summary */}
-                      <div className="px-4 py-2.5 border-b border-slate-100">
-                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Your Access</p>
-                        <div className="grid grid-cols-2 gap-1 text-[10px]">
-                          <span className={`flex items-center gap-1 ${can(currentUser, PERMISSIONS.UPLOAD_RECORD) ? 'text-emerald-700' : 'text-slate-300'}`}>
-                            <span className={`w-1.5 h-1.5 rounded-full ${can(currentUser, PERMISSIONS.UPLOAD_RECORD) ? 'bg-emerald-500' : 'bg-slate-200'}`}></span>
-                            Upload Records
-                          </span>
-                          <span className={`flex items-center gap-1 ${can(currentUser, PERMISSIONS.VIEW_REVIEW_GATE) ? 'text-emerald-700' : 'text-slate-300'}`}>
-                            <span className={`w-1.5 h-1.5 rounded-full ${can(currentUser, PERMISSIONS.VIEW_REVIEW_GATE) ? 'bg-emerald-500' : 'bg-slate-200'}`}></span>
-                            Review Gate {currentUser.role === 'Researcher' ? '(Own)' : ''}
-                          </span>
-                          <span className={`flex items-center gap-1 ${can(currentUser, PERMISSIONS.APPROVE_REJECT) ? 'text-emerald-700' : 'text-slate-300'}`}>
-                            <span className={`w-1.5 h-1.5 rounded-full ${can(currentUser, PERMISSIONS.APPROVE_REJECT) ? 'bg-emerald-500' : 'bg-slate-200'}`}></span>
-                            Approve / Publish
-                          </span>
-                          <span className={`flex items-center gap-1 ${can(currentUser, PERMISSIONS.VIEW_OUTREACH) ? 'text-emerald-700' : 'text-slate-300'}`}>
-                            <span className={`w-1.5 h-1.5 rounded-full ${can(currentUser, PERMISSIONS.VIEW_OUTREACH) ? 'bg-emerald-500' : 'bg-slate-200'}`}></span>
-                            Outreach Studio
-                          </span>
-                          <span className={`flex items-center gap-1 ${can(currentUser, PERMISSIONS.VIEW_AUDIT_LOG) ? 'text-emerald-700' : 'text-slate-300'}`}>
-                            <span className={`w-1.5 h-1.5 rounded-full ${can(currentUser, PERMISSIONS.VIEW_AUDIT_LOG) ? 'bg-emerald-500' : 'bg-slate-200'}`}></span>
-                            Audit Trail
-                          </span>
-                          <span className={`flex items-center gap-1 ${can(currentUser, PERMISSIONS.MANAGE_USERS) ? 'text-emerald-700' : 'text-slate-300'}`}>
-                            <span className={`w-1.5 h-1.5 rounded-full ${can(currentUser, PERMISSIONS.MANAGE_USERS) ? 'bg-emerald-500' : 'bg-slate-200'}`}></span>
-                            User Management
-                          </span>
-                        </div>
-                      </div>
+
 
                       {/* Switch Role */}
                       <div className="px-4 pt-2 pb-1">
@@ -202,9 +184,8 @@ export const Navbar = ({
                           <button
                             key={user.id}
                             onClick={() => onSwitchUser(user)}
-                            className={`w-full text-left px-4 py-2 flex items-center gap-3 text-xs hover:bg-slate-50 transition-colors ${
-                              currentUser.id === user.id ? 'bg-blue-50/70 border-l-2 border-blue-600' : ''
-                            }`}
+                            className={`w-full text-left px-4 py-2 flex items-center gap-3 text-xs hover:bg-slate-50 transition-colors ${currentUser.id === user.id ? 'bg-blue-50/70 border-l-2 border-blue-600' : ''
+                              }`}
                           >
                             <img
                               src={user.avatar}
@@ -220,28 +201,21 @@ export const Navbar = ({
                         ))}
                       </div>
 
-                      <div className="border-t border-slate-100 pt-1 px-3 mt-1">
-                        <button
-                          onClick={() => onNavigate('login')}
-                          className="w-full text-center py-1.5 text-xs text-blue-600 hover:text-blue-700 font-medium"
-                        >
-                          Open Login / Authentication Screen
-                        </button>
-                      </div>
+                      {currentUser.role === ROLES.PUBLIC && (
+                        <div className="border-t border-slate-100 pt-1 px-3 mt-1">
+                          <button
+                            onClick={() => onNavigate('login')}
+                            className="w-full text-center py-1.5 text-xs text-blue-600 hover:text-blue-700 font-medium"
+                          >
+                            Open Login / Authentication Screen
+                          </button>
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>
 
-                {/* Upload Button — only shown to users who can upload */}
-                {can(currentUser, PERMISSIONS.UPLOAD_RECORD) && (
-                  <button
-                    onClick={() => onNavigate('upload')}
-                    className="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-lg shadow-xs transition-colors"
-                  >
-                    <Icon name="upload" size={14} />
-                    Upload Record
-                  </button>
-                )}
+
               </>
             )}
           </div>
@@ -257,7 +231,7 @@ export const Navbar = ({
             className={`px-2.5 py-1 rounded whitespace-nowrap font-medium ${activePage === link.id
               ? 'bg-blue-600 text-white font-semibold'
               : 'text-slate-600 hover:bg-slate-200'
-            }`}
+              }`}
           >
             {link.label}
             {link.badge && (

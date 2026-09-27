@@ -35,7 +35,7 @@ export const HomePage = ({
 
         <div className="relative max-w-4xl mx-auto text-center space-y-6">
           <h1 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-white leading-tight">
-            PolarSetu
+            Polar Nexus
           </h1>
           <p className="text-base sm:text-xl text-blue-100 max-w-2xl mx-auto font-normal">
             A Unified Knowledge, Discovery and Outreach Platform for Indian Polar Science

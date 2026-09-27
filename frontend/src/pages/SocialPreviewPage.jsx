@@ -189,12 +189,12 @@ export const SocialPreviewPage = ({
                 </div>
                 <div>
                   <div className="flex items-center gap-1.5">
-                    <h4 className="font-bold text-sm text-slate-900">PolarSetu India</h4>
+                    <h4 className="font-bold text-sm text-slate-900">Polar Nexus India</h4>
                     <span className="w-4 h-4 rounded-full bg-blue-500 text-white flex items-center justify-center text-[10px] font-bold">
                       ✓
                     </span>
                   </div>
-                  <p className="text-xs text-slate-400">@PolarSetu • Ministry of Earth Sciences</p>
+                  <p className="text-xs text-slate-400">@PolarNexus • Ministry of Earth Sciences</p>
                 </div>
               </div>
               <span className="text-xs text-slate-400">Public Outreach</span>

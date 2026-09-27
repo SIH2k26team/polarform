@@ -1,11 +1,11 @@
-// LocalStorage persistence controller for PolarSetu
+// LocalStorage persistence controller for Polar Nexus
 import { INITIAL_RECORDS, INITIAL_EXPEDITIONS, INITIAL_AUDIT_LOGS, DEMO_USERS, INITIAL_SCIENTISTS } from './mockData';
 
 const STORAGE_KEYS = {
-  RECORDS: 'polarsetu_records_v1',
-  AUDIT_LOGS: 'polarsetu_audit_logs_v1',
-  EXPEDITIONS: 'polarsetu_expeditions_v1',
-  CURRENT_USER: 'polarsetu_current_user_v1'
+  RECORDS: 'polarsetu_records_v2',
+  AUDIT_LOGS: 'polarsetu_audit_logs_v2',
+  EXPEDITIONS: 'polarsetu_expeditions_v2',
+  CURRENT_USER: 'polarsetu_current_user_v2'
 };
 
 export const getStoredRecords = () => {

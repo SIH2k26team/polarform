@@ -12,7 +12,7 @@ export const Footer = ({ onNavigate }) => {
               <div className="w-7 h-7 rounded bg-blue-600 flex items-center justify-center text-white">
                 <Icon name="polar-logo" className="w-5 h-5" />
               </div>
-              PolarSetu
+              Polar Nexus
             </div>
             <p className="text-slate-400 text-xs leading-relaxed">
               Unified Knowledge, Discovery and Outreach Platform for Indian Polar Science. Bridging expeditions, datasets, reports, and public education.
@@ -57,7 +57,7 @@ export const Footer = ({ onNavigate }) => {
 
         {/* Bottom copyright */}
         <div className="pt-6 border-t border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-3 text-[11px]">
-          <p>© 2026 PolarSetu • Ministry of Earth Sciences (MoES) & NCPOR </p>
+          <p>© 2026 Polar Nexus • Ministry of Earth Sciences (MoES) & NCPOR </p>
         </div>
       </div>
     </footer>

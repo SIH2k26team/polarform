@@ -10,7 +10,7 @@ export const AboutPage = ({ onNavigate }) => {
           <span className="text-xs text-slate-400">Theme: Smart Education / Polar Science</span>
         </div>
         <h1 className="text-2xl sm:text-4xl font-extrabold text-slate-900 tracking-tight mt-1">
-          About PolarSetu
+          About Polar Nexus
         </h1>
         <p className="text-xs sm:text-sm text-slate-600 mt-1">
           A Unified Knowledge, Discovery and Outreach Platform for Indian Polar Science
@@ -43,10 +43,10 @@ export const AboutPage = ({ onNavigate }) => {
       <div className="bg-white rounded-xl border border-slate-200 p-6 shadow-xs space-y-4 text-xs text-slate-700 leading-relaxed">
         <h2 className="text-base font-bold text-slate-900 flex items-center gap-2">
           <Icon name="shield-check" size={18} className="text-emerald-600" />
-          The PolarSetu Architecture: Linking + Human-in-the-Loop
+          The Polar Nexus Architecture: Linking + Human-in-the-Loop
         </h2>
         <p>
-          PolarSetu acts as an intelligent discovery and outreach layer that connects to existing archives without replacing them:
+          Polar Nexus acts as an intelligent discovery and outreach layer that connects to existing archives without replacing them:
         </p>
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">

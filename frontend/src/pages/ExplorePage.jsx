@@ -52,7 +52,10 @@ export const ExplorePage = ({
       // Expedition match
       const matchesExpedition = selectedExpedition === 'All' || rec.expeditionName === selectedExpedition;
 
-      return matchesText && matchesType && matchesRegion && matchesExpedition;
+      // Exclude Changes Requested
+      const matchesStatus = rec.status !== 'Changes Requested';
+
+      return matchesText && matchesType && matchesRegion && matchesExpedition && matchesStatus;
     }).sort((a, b) => {
       if (sortBy === 'newest') {
         return (b.id > a.id ? 1 : -1);
@@ -304,7 +307,7 @@ export const ExplorePage = ({
                         {canAccessReview(currentUser, rec) && (rec.status === 'Under Review' || rec.status === 'Changes Requested') && (
                           <button
                             onClick={() => onOpenReview(rec)}
-                            className="px-2 py-1 bg-amber-500 text-white rounded text-xs font-medium transition-colors flex items-center gap-1 shadow-2xs hover:bg-amber-600"
+                            className="px-2 py-1 bg-amber-500 text-white rounded text-xs font-medium transition-colors flex items-center gap-1 shadow-2xs"
                           >
                             <Icon name="shield-check" size={12} />
                             {currentUser.role === 'Researcher' ? 'AI Draft' : 'Review Draft'}
