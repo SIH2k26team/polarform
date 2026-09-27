@@ -59,7 +59,7 @@ export const HomePage = ({
               />
               <button
                 type="submit"
-                className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3.5 text-sm font-semibold transition-colors flex items-center gap-2"
+                className="bg-blue-600 text-white px-6 py-3.5 text-sm font-semibold transition-colors flex items-center gap-2"
               >
                 <span>Search</span>
                 <Icon name="search" size={16} />
@@ -72,7 +72,7 @@ export const HomePage = ({
                   type="button"
                   key={tag}
                   onClick={() => onNavigate('explore', { query: tag })}
-                  className="bg-white/10 hover:bg-white/20 px-2 py-0.5 rounded text-white border border-white/15 transition-colors text-[11px]"
+                  className="bg-white/10 px-2 py-0.5 rounded text-white border border-white/15 transition-colors text-[11px]"
                 >
                   {tag}
                 </button>
@@ -201,7 +201,7 @@ export const HomePage = ({
                 <img
                   src={rec.thumbnail}
                   alt={rec.title}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  className="w-full h-full object-cover "
                 />
                 <div className="absolute top-2 left-2 flex gap-1.5">
                   <ContentTypeBadge type={rec.contentType} />
@@ -249,14 +249,14 @@ export const HomePage = ({
                   <div className="flex items-center gap-2">
                     <button
                       onClick={() => onOpenStudentView(rec)}
-                      className="text-[11px] px-2 py-1 bg-teal-50 text-teal-700 hover:bg-teal-100 rounded font-medium transition-colors"
+                      className="text-[11px] px-2 py-1  text-teal-700 rounded font-medium transition-colors"
                       title="Read Student Explainer"
                     >
                       Student View
                     </button>
                     <button
                       onClick={() => onOpenOutreach(rec)}
-                      className="text-[11px] px-2 py-1 bg-purple-50 text-purple-700 hover:bg-purple-100 rounded font-medium transition-colors"
+                      className="text-[11px] px-2 py-1  text-purple-700  rounded font-medium transition-colors"
                       title="Outreach Post Pack"
                     >
                       Outreach

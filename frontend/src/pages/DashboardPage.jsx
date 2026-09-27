@@ -44,12 +44,12 @@ export const DashboardPage = ({
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl sm:text-3xl font-bold text-slate-900">
-            {userIsResearcher ? 'Researcher Workspace & Drafts' : 'User Dashboard & Review Queue'}
+            {userIsResearcher ? 'Dashboard' : 'Dashboard'}
           </h1>
           <p className="text-xs sm:text-sm text-slate-500 mt-1">
             {userIsResearcher
-              ? 'Manage your submissions, inspect AI-generated explainers, and track reviewer feedback.'
-              : 'Manage your submissions, inspect human approval queues, and review the immutable audit log.'}
+              ? 'Manage your submissions, inspect AI-generated explainers, and track feedback.'
+              : 'Manage your submissions, inspect human approval queues, and review the audit log.'}
           </p>
         </div>
 
@@ -81,8 +81,7 @@ export const DashboardPage = ({
               allowed: canReviewGate
             },
             { id: 'audit', label: 'Audit Trail Log', icon: 'clock', allowed: canAudit },
-            { id: 'profile', label: 'My Role & Profile', icon: 'user', allowed: true },
-            { id: 'settings', label: 'System Settings', icon: 'sliders', allowed: canManage }
+            { id: 'profile', label: 'My Profile', icon: 'user', allowed: true },
           ].filter(item => item.allowed).map((item) => (
             <button
               key={item.id}
@@ -235,21 +234,6 @@ export const DashboardPage = ({
           {/* Tab Content 2: Approvals / Review Queue */}
           {activeTab === 'approvals' && (
             <div className="bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden space-y-4">
-              <div className="p-4 bg-amber-50/70 border-b border-amber-200/80 flex items-center justify-between">
-                <div>
-                  <h3 className="font-bold text-xs uppercase tracking-wider text-amber-900 flex items-center gap-1.5">
-                    <Icon name="shield-check" size={16} />
-                    {userIsResearcher
-                      ? `My Submissions Awaiting Review (${pendingRecords.length})`
-                      : `Pending Human Review Queue (${pendingRecords.length})`}
-                  </h3>
-                  <p className="text-[11px] text-amber-800">
-                    {userIsResearcher
-                      ? 'Inspect, edit, and track advisory AI drafts for your uploaded submissions.'
-                      : 'Records and AI drafts awaiting verification by a designated reviewer'}
-                  </p>
-                </div>
-              </div>
 
               {pendingRecords.length === 0 ? (
                 <div className="p-8 text-center text-xs text-slate-500 space-y-2">
@@ -355,9 +339,9 @@ export const DashboardPage = ({
                   <div key={log.id} className="p-4 hover:bg-slate-50 transition-colors space-y-1.5 text-xs">
                     <div className="flex flex-wrap items-center justify-between gap-2">
                       <div className="flex items-center gap-2">
-                        <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${log.action === 'PUBLISHED' ? 'bg-emerald-100 text-emerald-800' :
-                          log.action === 'AI_DRAFTED' ? 'bg-blue-100 text-blue-800' :
-                            'bg-slate-100 text-slate-800'
+                        <span className={` py-0.5 rounded text-[10px] font-bold ${log.action === 'PUBLISHED' ? ' text-emerald-800' :
+                          log.action === 'AI_DRAFTED' ? ' text-blue-800' :
+                            ' text-slate-800'
                           }`}>
                           {log.action}
                         </span>
@@ -395,21 +379,7 @@ export const DashboardPage = ({
             </div>
           )}
 
-          {/* Tab Content 6: Settings */}
-          {activeTab === 'settings' && (
-            <div className="bg-white rounded-xl border border-slate-200 shadow-xs p-6 space-y-4">
-              <h3 className="font-bold text-sm text-slate-900">Prototype Demo Settings</h3>
-              <p className="text-xs text-slate-600">
-                You can reset the prototype demo data back to initial state at any time.
-              </p>
-              <button
-                onClick={onResetData}
-                className="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white rounded-lg text-xs font-semibold"
-              >
-                Reset Prototype Data to Default
-              </button>
-            </div>
-          )}
+
         </main>
       </div>
     </div>

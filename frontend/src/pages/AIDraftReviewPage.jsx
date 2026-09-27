@@ -160,7 +160,37 @@ export const AIDraftReviewPage = ({
         </div>
       </div>
 
+      {/* Record Selector Bar */}
+      <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-2xs">
+        <div className="space-y-0.5">
+          <label htmlFor="record-selector" className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+            <Icon name="file-text" size={16} className="text-blue-600" />
+            Select Record to Review:
+          </label>
+          <p className="text-[11px] text-slate-500">
+            Choose any submission from the queue to inspect plain-language drafts, scientific data, or approve changes.
+          </p>
+        </div>
 
+        <select
+          id="record-selector"
+          value={record.id}
+          onChange={(e) => {
+            const selected = allRecords.find(r => r.id === e.target.value);
+            if (selected) {
+              setActiveRecordId(selected.id);
+              if (onSelectRecord) onSelectRecord(selected);
+            }
+          }}
+          className="w-full sm:w-auto text-xs bg-white border border-slate-300 rounded-lg px-3 py-2 font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-2xs cursor-pointer max-w-xl truncate"
+        >
+          {myAccessibleRecords.map((r) => (
+            <option key={r.id} value={r.id}>
+              [{r.status}] {r.title} ({r.region})
+            </option>
+          ))}
+        </select>
+      </div>
 
       {/* Main Stacked Layout */}
       <div className="space-y-6">

@@ -2,14 +2,16 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Icon } from './Icon';
 import { RoleBadge } from './AccessDenied';
 import { DEMO_USERS } from '../data/mockData';
-import { can, PERMISSIONS, ROLES } from '../auth/permissions';
+import { can, PERMISSIONS, ROLES, isReviewer } from '../auth/permissions';
 
 export const Navbar = ({
   activePage,
   onNavigate,
   currentUser,
   onSwitchUser,
-  pendingReviewCount = 0
+  pendingReviewCount = 0,
+  isLoggedIn = false,
+  onLogout
 }) => {
   const [showUserMenu, setShowUserMenu] = useState(false);
   const dropdownRef = useRef(null);
@@ -64,11 +66,14 @@ export const Navbar = ({
     }
   ];
 
-  // Only show links for home page or based on user role
-  const navLinks = activePage === 'home'
+  // If user is NOT signed in, show public links (home, explore, about).
+  // After sign in, remove 'about' link and show internal portal links based on role.
+  const navLinks = !isLoggedIn
     ? allLinks.filter(link => ['home', 'explore', 'about'].includes(link.id))
     : allLinks.filter(link =>
-      link.permission === null || can(currentUser, link.permission)
+      link.id !== 'about' &&
+      !(link.id === 'upload' && isReviewer(currentUser)) &&
+      (link.permission === null || can(currentUser, link.permission))
     );
 
   return (
@@ -118,9 +123,9 @@ export const Navbar = ({
             </nav>
           </div>
 
-          {/* Right Side: Sign In button on Homepage, User Profile & Upload on other pages */}
+          {/* Right Side: Sign In button when NOT signed in, User Profile when signed in */}
           <div className="flex items-center gap-3">
-            {activePage === 'home' ? (
+            {!isLoggedIn ? (
               <button
                 onClick={() => onNavigate('login')}
                 className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs sm:text-sm font-semibold rounded-lg shadow-sm transition-colors cursor-pointer"
@@ -173,8 +178,6 @@ export const Navbar = ({
                         </div>
                       </div>
 
-
-
                       {/* Switch Role */}
                       <div className="px-4 pt-2 pb-1">
                         <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Switch Demo Role</p>
@@ -201,21 +204,22 @@ export const Navbar = ({
                         ))}
                       </div>
 
-                      {currentUser.role === ROLES.PUBLIC && (
-                        <div className="border-t border-slate-100 pt-1 px-3 mt-1">
+                      {onLogout && (
+                        <div className="border-t border-slate-100 pt-2 px-3 mt-1">
                           <button
-                            onClick={() => onNavigate('login')}
-                            className="w-full text-center py-1.5 text-xs text-blue-600 hover:text-blue-700 font-medium"
+                            onClick={() => {
+                              setShowUserMenu(false);
+                              onLogout();
+                            }}
+                            className="w-full text-center py-1.5 text-xs text-rose-600 hover:text-rose-700 font-semibold flex items-center justify-center gap-1.5  rounded transition-colors"
                           >
-                            Open Login / Authentication Screen
+                            Log Out
                           </button>
                         </div>
                       )}
                     </div>
                   )}
                 </div>
-
-
               </>
             )}
           </div>

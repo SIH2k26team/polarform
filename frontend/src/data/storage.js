@@ -5,7 +5,22 @@ const STORAGE_KEYS = {
   RECORDS: 'polarsetu_records_v2',
   AUDIT_LOGS: 'polarsetu_audit_logs_v2',
   EXPEDITIONS: 'polarsetu_expeditions_v2',
-  CURRENT_USER: 'polarsetu_current_user_v2'
+  CURRENT_USER: 'polarsetu_current_user_v2',
+  IS_LOGGED_IN: 'polarsetu_is_logged_in_v2'
+};
+
+export const getStoredIsLoggedIn = () => {
+  try {
+    const saved = localStorage.getItem(STORAGE_KEYS.IS_LOGGED_IN);
+    if (saved !== null) return JSON.parse(saved);
+  } catch (e) {}
+  return false; // Default: Not logged in until Sign In action
+};
+
+export const saveStoredIsLoggedIn = (val) => {
+  try {
+    localStorage.setItem(STORAGE_KEYS.IS_LOGGED_IN, JSON.stringify(val));
+  } catch (e) {}
 };
 
 export const getStoredRecords = () => {
@@ -96,6 +111,7 @@ export const resetToDefaultData = () => {
   localStorage.setItem(STORAGE_KEYS.AUDIT_LOGS, JSON.stringify(INITIAL_AUDIT_LOGS));
   localStorage.setItem(STORAGE_KEYS.EXPEDITIONS, JSON.stringify(INITIAL_EXPEDITIONS));
   localStorage.setItem(STORAGE_KEYS.CURRENT_USER, JSON.stringify(DEMO_USERS[0]));
+  localStorage.setItem(STORAGE_KEYS.IS_LOGGED_IN, JSON.stringify(false));
   return {
     records: INITIAL_RECORDS,
     auditLogs: INITIAL_AUDIT_LOGS,

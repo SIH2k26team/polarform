@@ -22,6 +22,8 @@ import {
   addAuditLog,
   getCurrentUser,
   setCurrentUser,
+  getStoredIsLoggedIn,
+  saveStoredIsLoggedIn,
   resetToDefaultData
 } from './data/storage';
 
@@ -120,6 +122,7 @@ export default function App() {
   const [records, setRecords] = useState([]);
   const [auditLogs, setAuditLogs] = useState([]);
   const [currentUser, setUserState] = useState(getCurrentUser());
+  const [isLoggedIn, setIsLoggedIn] = useState(getStoredIsLoggedIn());
   const initialRoute = getRouteFromPath(window.location.pathname, window.location.search);
   const [activePage, setActivePage] = useState(initialRoute.page);
   const [pageParams, setPageParams] = useState(initialRoute.params);
@@ -198,7 +201,25 @@ export default function App() {
   const handleSwitchUser = (newUser) => {
     setCurrentUser(newUser);
     setUserState(newUser);
+    saveStoredIsLoggedIn(true);
+    setIsLoggedIn(true);
     showToast(`Switched to: ${newUser.name} (${newUser.role})`, 'info', 'Role Changed');
+  };
+
+  const handleLoginSuccess = (user) => {
+    setCurrentUser(user);
+    setUserState(user);
+    saveStoredIsLoggedIn(true);
+    setIsLoggedIn(true);
+    showToast(`Welcome back, ${user.name}!`, 'success', 'Signed In');
+    handleNavigate('dashboard');
+  };
+
+  const handleLogout = () => {
+    saveStoredIsLoggedIn(false);
+    setIsLoggedIn(false);
+    showToast('Signed out successfully.', 'info', 'Logged Out');
+    handleNavigate('home');
   };
 
   const handleSelectRecord = (record) => {
@@ -396,6 +417,8 @@ export default function App() {
       setRecords(reset.records);
       setAuditLogs(reset.auditLogs);
       setUserState(reset.currentUser);
+      saveStoredIsLoggedIn(false);
+      setIsLoggedIn(false);
       setSelectedRecord(reset.records[0]);
       showToast('Prototype data reset to initial 12 records.', 'info', 'Reset Complete');
       handleNavigate('home');
@@ -430,6 +453,8 @@ export default function App() {
           currentUser={currentUser}
           onSwitchUser={handleSwitchUser}
           pendingReviewCount={pendingReviewCount}
+          isLoggedIn={isLoggedIn}
+          onLogout={handleLogout}
         />
       )}
 
@@ -456,7 +481,7 @@ export default function App() {
 
         {activePage === 'explore' && (
           <ExplorePage
-            records={visibleRecords}
+            records={records.filter(r => r.status === 'Published')}
             currentUser={currentUser}
             initialQuery={pageParams.query || ''}
             onSelectRecord={handleSelectRecord}
@@ -559,10 +584,7 @@ export default function App() {
         {activePage === 'login' && (
           <LoginPage
             currentUser={currentUser}
-            onLoginSuccess={(user) => {
-              handleSwitchUser(user);
-              handleNavigate('dashboard');
-            }}
+            onLoginSuccess={handleLoginSuccess}
             onNavigate={handleNavigate}
           />
         )}
