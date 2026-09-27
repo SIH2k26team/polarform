@@ -481,7 +481,7 @@ export default function App() {
 
         {activePage === 'explore' && (
           <ExplorePage
-            records={visibleRecords}
+            records={records.filter(r => r.status === 'Published')}
             currentUser={currentUser}
             initialQuery={pageParams.query || ''}
             onSelectRecord={handleSelectRecord}

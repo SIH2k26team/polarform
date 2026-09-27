@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Icon } from '../components/Icon';
 import { RegionBadge } from '../components/Badge';
 
@@ -21,9 +21,42 @@ export const StudentExplainerPage = ({
     ],
     glossary: [
       { term: "Polar Science", definition: "The scientific study of Earth's freezing Arctic, Antarctic, and high mountain regions." },
-      { term: "NCPOR", definition: "National Centre for Polar and Ocean Research, India's premier polar research institute located in Goa." }
+      { term: "NCPOR", definition: "National Centre for Polar and Ocean Research, India's premier polar research institute located in Goa." },
+      { term: "Cryosphere", definition: "The frozen water part of the Earth system, including snow cover, glaciers, ice caps, and permafrost." }
     ]
   };
+
+  // Default glossary additions if fewer than 3
+  const fullGlossary = [...(explainer.glossary || [])];
+  if (fullGlossary.length < 3) {
+    fullGlossary.push(
+      { term: "Cryosphere", definition: "The frozen water component of the Earth system, including sea ice, lake ice, river ice, snow cover, glaciers, ice caps, ice sheets, and frozen ground." },
+      { term: "Albedo Effect", definition: "The fraction of solar energy reflected by Earth's surface. Bright ice reflects solar radiation back into space, keeping the planet cool." }
+    );
+  }
+
+  // Region-based Did You Know facts
+  const regionFacts = {
+    Antarctica: [
+      "Antarctica holds 90% of Earth's ice and 70% of the world's freshwater.",
+      "India operates two active research bases in Antarctica: Maitri (1988) and Bharati (2012).",
+      "During polar winter nights, temperatures drop below -60°C and auroras illuminate the sky."
+    ],
+    Arctic: [
+      "The Arctic is warming four times faster than the rest of the planet.",
+      "India's Himadri station is located at 78°N in Svalbard, Norway—only 1,200 km from the North Pole.",
+      "Melting Arctic sea ice impacts global jet streams and Indian summer monsoon rainfall patterns."
+    ],
+    Himalayas: [
+      "The Himalayas contain over 9,500 glaciers feeding major rivers like the Ganges, Indus, and Brahmaputra.",
+      "Himansh Station sits at 4,000 meters altitude in the Chandra Basin, Himachal Pradesh.",
+      "Over 1.3 billion people depend on freshwater originating from Himalayan glacial meltwater."
+    ]
+  }[record.region] || [
+    "Polar regions act as Earth's natural air conditioners.",
+    "Data collected by Indian scientists is shared with international polar research databases.",
+    "Satellite telemetry links Indian polar stations in real-time with NCPOR headquarters in Goa."
+  ];
 
   const handleCopyLink = () => {
     navigator.clipboard.writeText(window.location.href);
@@ -40,7 +73,7 @@ export const StudentExplainerPage = ({
         <Icon name="arrow-left" size={14} /> Back to Search / Records
       </button>
 
-      {/* Header matching Reference Screenshot */}
+      {/* Header */}
       <div>
         <div className="flex items-center gap-2">
           <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 bg-teal-100 text-teal-800 rounded">
@@ -53,11 +86,11 @@ export const StudentExplainerPage = ({
           Student Explainer
         </h1>
         <p className="text-xs sm:text-sm text-slate-500 mt-1">
-          A simple explanation of this research for students and curious minds.
+          A simple, interactive guide explaining this polar research for students and science enthusiasts.
         </p>
       </div>
 
-      {/* Hero Visual Card matching Reference UI */}
+      {/* Hero Visual Card */}
       <div className="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-xs">
         <div className="grid grid-cols-1 md:grid-cols-2">
           <div className="h-64 md:h-auto bg-slate-100 relative">
@@ -81,41 +114,61 @@ export const StudentExplainerPage = ({
           </div>
         </div>
 
-        {/* Explainer Story Body */}
+        {/* Explainer Body */}
         <div className="p-6 md:p-8 border-t border-slate-100 space-y-6">
+          {/* Main Story Content */}
           <div className="space-y-3">
-            <h3 className="text-base font-bold text-slate-900">How This Science Works</h3>
-            <p className="text-xs sm:text-sm text-slate-700 leading-relaxed">
+            <h3 className="text-base font-bold text-slate-900 flex items-center gap-1.5">
+              <Icon name="book-open" size={18} className="text-teal-600" />
+              How This Science Works
+            </h3>
+            <p className="text-xs sm:text-sm text-slate-700 leading-relaxed bg-slate-50/70 p-4 rounded-lg border border-slate-200">
               {explainer.bodyText}
             </p>
           </div>
 
-          {/* Key Takeaways Callout Box matching Reference UI */}
+          {/* Key Takeaways Callout Box */}
           <div className="bg-sky-50 border border-sky-200 rounded-xl p-5 space-y-3">
             <h4 className="font-bold text-sm text-sky-950 flex items-center gap-2">
               <Icon name="info" size={18} className="text-blue-600" />
-              Key Takeaways
+              Key Takeaways for Students
             </h4>
-            <ul className="space-y-2 text-xs text-sky-900">
+            <ul className="space-y-2.5 text-xs text-sky-900">
               {explainer.keyTakeaways.map((point, index) => (
                 <li key={index} className="flex items-start gap-2.5">
                   <span className="w-1.5 h-1.5 rounded-full bg-blue-600 mt-1.5 shrink-0"></span>
-                  <span className="leading-relaxed">{point}</span>
+                  <span className="leading-relaxed font-medium">{point}</span>
                 </li>
               ))}
             </ul>
           </div>
 
-          {/* Polar Glossary */}
-          {explainer.glossary && explainer.glossary.length > 0 && (
+          {/* Did You Know? Polar Fast Facts Grid */}
+          <div className="bg-gradient-to-br from-indigo-50/80 to-purple-50/80 border border-indigo-200/80 rounded-xl p-5 space-y-3">
+            <h4 className="font-bold text-sm text-indigo-950 flex items-center gap-2">
+              <Icon name="sparkles" size={16} className="text-amber-500" />
+              Did You Know? — {record.region} Polar Facts
+            </h4>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1 text-xs">
+              {regionFacts.map((fact, idx) => (
+                <div key={idx} className="bg-white/90 p-3.5 rounded-lg border border-indigo-100 shadow-2xs space-y-1">
+                  <span className="text-[10px] font-bold uppercase text-indigo-600">Fact #{idx + 1}</span>
+                  <p className="text-slate-700 leading-relaxed text-[11px]">{fact}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Polar Vocabulary Glossary */}
+          {fullGlossary.length > 0 && (
             <div className="space-y-3 pt-2">
               <h4 className="font-bold text-sm text-slate-900 flex items-center gap-1.5">
                 <Icon name="book" size={16} className="text-teal-600" />
                 Polar Science Vocabulary
               </h4>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                {explainer.glossary.map((g, i) => (
-                  <div key={i} className="p-3.5 bg-slate-50 rounded-lg border border-slate-200 text-xs space-y-1">
+                {fullGlossary.map((g, i) => (
+                  <div key={i} className="p-3.5 bg-slate-50 rounded-lg border border-slate-200 text-xs space-y-1 hover:border-teal-300 transition-colors">
                     <span className="font-bold text-slate-800 block text-blue-700">{g.term}</span>
                     <p className="text-slate-600 leading-relaxed text-[11px]">{g.definition}</p>
                   </div>
@@ -123,6 +176,8 @@ export const StudentExplainerPage = ({
               </div>
             </div>
           )}
+
+
 
           {/* Expedition Journey Timeline */}
           <div className="space-y-3 pt-4 border-t border-slate-100">

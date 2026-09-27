@@ -249,14 +249,14 @@ export const HomePage = ({
                   <div className="flex items-center gap-2">
                     <button
                       onClick={() => onOpenStudentView(rec)}
-                      className="text-[11px] px-2 py-1 bg-teal-50 text-teal-700 hover:bg-teal-100 rounded font-medium transition-colors"
+                      className="text-[11px] px-2 py-1  text-teal-700 rounded font-medium transition-colors"
                       title="Read Student Explainer"
                     >
                       Student View
                     </button>
                     <button
                       onClick={() => onOpenOutreach(rec)}
-                      className="text-[11px] px-2 py-1 bg-purple-50 text-purple-700 hover:bg-purple-100 rounded font-medium transition-colors"
+                      className="text-[11px] px-2 py-1  text-purple-700  rounded font-medium transition-colors"
                       title="Outreach Post Pack"
                     >
                       Outreach

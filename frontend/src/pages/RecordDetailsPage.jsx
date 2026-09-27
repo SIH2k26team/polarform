@@ -92,10 +92,10 @@ export const RecordDetailsPage = ({
           <span>Quick Views:</span>
         </div>
 
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="flex flex-wrap items-center gap-3">
           <button
             onClick={() => onOpenStudentView(record)}
-            className="px-3.5 py-1.5 bg-teal-50 hover:bg-teal-100 text-teal-700 rounded-lg text-xs font-semibold transition-colors flex items-center gap-1.5"
+            className="px-2.5 py-1 text-teal-700 hover:text-teal-800 text-xs font-semibold transition-colors flex items-center gap-1.5"
           >
             <Icon name="book-open" size={14} /> Student Explainer
           </button>
@@ -104,7 +104,7 @@ export const RecordDetailsPage = ({
           {can(currentUser, PERMISSIONS.VIEW_OUTREACH) && (
             <button
               onClick={() => onOpenOutreach(record)}
-              className="px-3.5 py-1.5 bg-purple-50 hover:bg-purple-100 text-purple-700 rounded-lg text-xs font-semibold transition-colors flex items-center gap-1.5"
+              className="px-2.5 py-1 text-purple-700 hover:text-purple-800 text-xs font-semibold transition-colors flex items-center gap-1.5"
             >
               <Icon name="share" size={14} /> Outreach Post Studio
             </button>
@@ -114,7 +114,7 @@ export const RecordDetailsPage = ({
           {canAccessReview(currentUser, record) && (
             <button
               onClick={() => onOpenReview(record)}
-              className="px-3.5 py-1.5 bg-amber-500 hover:bg-amber-600 text-white rounded-lg text-xs font-semibold transition-colors flex items-center gap-1.5 shadow-2xs"
+              className="px-2.5 py-1 text-amber-600 hover:text-amber-700 text-xs font-semibold transition-colors flex items-center gap-1.5"
             >
               <Icon name="shield-check" size={14} />
               {currentUser.role === 'Researcher' ? 'Inspect / Edit AI Draft' : 'Review AI Draft'}
@@ -161,47 +161,111 @@ export const RecordDetailsPage = ({
             {/* Tab 1: Overview */}
             {activeTab === 'overview' && (
               <div className="space-y-6 text-xs text-slate-700">
+                {/* About & Executive Summary */}
                 <div className="space-y-2">
-                  <h3 className="font-bold text-sm text-slate-900">About this Research</h3>
-                  <p className="leading-relaxed">{record.description}</p>
+                  <h3 className="font-bold text-sm text-slate-900 flex items-center gap-1.5">
+                    <Icon name="file-text" size={15} className="text-blue-600" />
+                    About this Research
+                  </h3>
+                  <p className="leading-relaxed text-slate-700 bg-slate-50/70 p-3.5 rounded-lg border border-slate-200/80">
+                    {record.description}
+                  </p>
                 </div>
 
+                {/* Scientific Abstract */}
                 <div className="space-y-2">
-                  <h3 className="font-bold text-sm text-slate-900">Scientific Abstract</h3>
-                  <div className="p-3.5 bg-slate-50 rounded-lg border border-slate-200 text-slate-600 leading-relaxed font-serif">
+                  <h3 className="font-bold text-sm text-slate-900 flex items-center gap-1.5">
+                    <Icon name="layers" size={15} className="text-indigo-600" />
+                    Scientific Abstract
+                  </h3>
+                  <div className="p-4 bg-slate-50 rounded-lg border border-slate-200 text-slate-700 leading-relaxed font-serif">
                     {record.abstract || record.description}
                   </div>
                 </div>
 
-                {/* Key Technical Information Grid matching Reference UI */}
+                {/* Research Objectives & Methodology */}
                 <div className="space-y-2">
-                  <h3 className="font-bold text-sm text-slate-900">Key Information</h3>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 bg-slate-50 p-4 rounded-lg border border-slate-200">
+                  <h3 className="font-bold text-sm text-slate-900 flex items-center gap-1.5">
+                    <Icon name="compass" size={15} className="text-teal-600" />
+                    Objectives & Scope
+                  </h3>
+                  <div className="p-4 bg-white rounded-lg border border-slate-200 space-y-2">
+                    <p className="leading-relaxed">
+                      This scientific contribution was conducted under <strong>{record.expeditionName}</strong> in the <strong>{record.region}</strong> region ({record.location}).
+                    </p>
+                    <ul className="list-disc pl-5 space-y-1.5 text-slate-600">
+                      <li><strong>Primary Field Goal:</strong> Systematic observational data collection and baseline environmental monitoring for cryospheric and polar sciences.</li>
+                      <li><strong>Data Integration:</strong> Formally ingested into the NCPOR polar knowledge graph with direct cross-links to National Polar Data Centre (NPDC) repositories.</li>
+                      <li><strong>Scientific Impact:</strong> Provides critical empirical input for climate modeling, ecosystem assessment, and seasonal trend analysis in high-latitude environments.</li>
+                    </ul>
+                  </div>
+                </div>
+
+                {/* Key Technical Information Grid */}
+                <div className="space-y-2">
+                  <h3 className="font-bold text-sm text-slate-900 flex items-center gap-1.5">
+                    <Icon name="shield-check" size={15} className="text-blue-600" />
+                    Key Technical Specifications
+                  </h3>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 bg-slate-50 p-4 rounded-lg border border-slate-200">
                     <div>
-                      <span className="text-slate-400 block text-[11px]">Location</span>
+                      <span className="text-slate-400 block text-[11px]">Location / Base</span>
                       <span className="font-semibold text-slate-800">{record.location}</span>
                     </div>
                     <div>
-                      <span className="text-slate-400 block text-[11px]">Duration / Date</span>
-                      <span className="font-semibold text-slate-800">{record.date}</span>
+                      <span className="text-slate-400 block text-[11px]">Region / Domain</span>
+                      <span className="font-semibold text-slate-800">{record.region}</span>
+                    </div>
+                    <div>
+                      <span className="text-slate-400 block text-[11px]">Expedition Campaign</span>
+                      <span className="font-semibold text-slate-800">{record.expeditionName}</span>
+                    </div>
+                    <div>
+                      <span className="text-slate-400 block text-[11px]">Lead Researcher / Author</span>
+                      <span className="font-semibold text-slate-800">{record.authorName || "NCPOR Polar Research Team"}</span>
                     </div>
                     <div>
                       <span className="text-slate-400 block text-[11px]">Lead Institution</span>
                       <span className="font-semibold text-slate-800">{record.institution}</span>
                     </div>
                     <div>
+                      <span className="text-slate-400 block text-[11px]">Date Recorded</span>
+                      <span className="font-semibold text-slate-800">{record.date}</span>
+                    </div>
+                    <div>
                       <span className="text-slate-400 block text-[11px]">Publication DOI</span>
                       <span className="font-mono text-blue-600">{record.doi || "N/A (Expedition Technical Report)"}</span>
+                    </div>
+                    <div>
+                      <span className="text-slate-400 block text-[11px]">Verification Status</span>
+                      <span className="font-semibold text-emerald-700">{record.status}</span>
+                    </div>
+                    <div>
+                      <span className="text-slate-400 block text-[11px]">Access Level</span>
+                      <span className="font-semibold text-slate-800">Open Access (MoES Data Policy)</span>
                     </div>
                   </div>
                 </div>
 
-                {/* Tags */}
+                {/* Plain-Language AI Summary (if available) */}
+                {record.aiDraft?.summary && (
+                  <div className="p-4 bg-blue-50/70 rounded-lg border border-blue-200 space-y-1.5">
+                    <h4 className="font-bold text-blue-950 text-xs flex items-center gap-1.5">
+                      <Icon name="sparkles" size={14} className="text-blue-600" />
+                      Executive Plain-Language Summary
+                    </h4>
+                    <p className="text-slate-700 leading-relaxed text-xs">
+                      {record.aiDraft.summary}
+                    </p>
+                  </div>
+                )}
+
+                {/* Topic Keywords */}
                 <div className="space-y-2">
                   <h3 className="font-bold text-sm text-slate-900">Topic Keywords</h3>
                   <div className="flex flex-wrap gap-1.5">
                     {record.tags.map((t) => (
-                      <span key={t} className="px-2.5 py-1 bg-slate-100 text-slate-700 rounded-md font-medium text-xs">
+                      <span key={t} className="px-2.5 py-1 bg-slate-100 text-slate-700 rounded-md font-medium text-xs border border-slate-200">
                         #{t}
                       </span>
                     ))}
