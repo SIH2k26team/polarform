@@ -209,10 +209,9 @@ export const Navbar = ({
                               setShowUserMenu(false);
                               onLogout();
                             }}
-                            className="w-full text-center py-1.5 text-xs text-rose-600 hover:text-rose-700 font-semibold flex items-center justify-center gap-1.5 hover:bg-rose-50 rounded transition-colors"
+                            className="w-full text-center py-1.5 text-xs text-rose-600 hover:text-rose-700 font-semibold flex items-center justify-center gap-1.5  rounded transition-colors"
                           >
-                            <Icon name="log-out" size={14} />
-                            Sign Out / Log Out
+                            Log Out
                           </button>
                         </div>
                       )}

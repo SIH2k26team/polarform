@@ -337,29 +337,6 @@ export const RecordDetailsPage = ({
         <div className="space-y-6">
           {/* Interactive AI Chatbot Window for this Record */}
           <RecordChatbot record={record} />
-
-          {/* Related Discovery Recommendations */}
-          <div className="bg-slate-50 rounded-xl border border-slate-200 p-4 space-y-3 text-xs">
-            <h4 className="font-bold text-slate-800 flex items-center gap-1.5">
-              <Icon name="sparkles" size={14} className="text-amber-500" />
-              Other Records from {record.region}
-            </h4>
-            <div className="space-y-2">
-              {relatedRecords.slice(0, 2).map((rel) => (
-                <div
-                  key={rel.id}
-                  onClick={() => onSelectRecord(rel)}
-                  className="p-2.5 bg-white rounded-lg border border-slate-200 hover:border-blue-400 cursor-pointer transition-colors space-y-1"
-                >
-                  <div className="flex items-center gap-1.5">
-                    <ContentTypeBadge type={rel.contentType} />
-                    <span className="text-[10px] text-slate-400">{rel.date}</span>
-                  </div>
-                  <h5 className="font-semibold text-slate-800 truncate">{rel.title}</h5>
-                </div>
-              ))}
-            </div>
-          </div>
         </div>
       </div>
     </div>

@@ -57,16 +57,16 @@ export const AboutPage = ({ onNavigate }) => {
             </p>
           </div>
 
-          <div className="p-4 bg-blue-50/60 rounded-lg border border-blue-200 space-y-2">
+          <div className="p-4 bg-slate-50 rounded-lg border border-slate-200 space-y-2">
             <h3 className="font-bold text-blue-950 text-sm">2. AI Drafting Adapter</h3>
             <p className="text-[11px] text-slate-600">
               Extracts text from uploaded documents and automatically drafts plain-language summaries, student explainers, and outreach captions.
             </p>
           </div>
 
-          <div className="p-4 bg-emerald-50 rounded-lg border border-emerald-200 space-y-2">
-            <h3 className="font-bold text-emerald-950 text-sm">3. Human Review Gate</h3>
-            <p className="text-[11px] text-emerald-800">
+          <div className="p-4 bg-slate-50 rounded-lg border border-slate-200 space-y-2">
+            <h3 className="font-bold text-slate-900 text-sm">3. Human Review Gate</h3>
+            <p className="text-[11px] text-slate-600">
               AI outputs are strictly non-destructive drafts. No content goes public without approval by a verified scientist or reviewer.
             </p>
           </div>
@@ -115,19 +115,7 @@ export const AboutPage = ({ onNavigate }) => {
         </div>
       </div>
 
-      {/* CTA */}
-      <div className="p-6 bg-slate-900 text-white rounded-xl flex flex-col sm:flex-row items-center justify-between gap-4">
-        <div>
-          <h3 className="font-bold text-sm">Explore the Live Prototype Records</h3>
-          <p className="text-xs text-slate-400">Discover all 12 interconnected sample records, review queues, and explainers.</p>
-        </div>
-        <button
-          onClick={() => onNavigate('explore')}
-          className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-semibold shrink-0 transition-colors"
-        >
-          Explore Records Now
-        </button>
-      </div>
+
     </div>
   );
 };

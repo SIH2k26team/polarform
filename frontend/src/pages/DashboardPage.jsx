@@ -81,8 +81,7 @@ export const DashboardPage = ({
               allowed: canReviewGate
             },
             { id: 'audit', label: 'Audit Trail Log', icon: 'clock', allowed: canAudit },
-            { id: 'profile', label: 'My Role & Profile', icon: 'user', allowed: true },
-            { id: 'settings', label: 'System Settings', icon: 'sliders', allowed: canManage }
+            { id: 'profile', label: 'My Profile', icon: 'user', allowed: true },
           ].filter(item => item.allowed).map((item) => (
             <button
               key={item.id}
@@ -395,21 +394,7 @@ export const DashboardPage = ({
             </div>
           )}
 
-          {/* Tab Content 6: Settings */}
-          {activeTab === 'settings' && (
-            <div className="bg-white rounded-xl border border-slate-200 shadow-xs p-6 space-y-4">
-              <h3 className="font-bold text-sm text-slate-900">Prototype Demo Settings</h3>
-              <p className="text-xs text-slate-600">
-                You can reset the prototype demo data back to initial state at any time.
-              </p>
-              <button
-                onClick={onResetData}
-                className="px-4 py-2 bg-rose-600 text-white rounded-lg text-xs font-semibold"
-              >
-                Reset Prototype Data to Default
-              </button>
-            </div>
-          )}
+
         </main>
       </div>
     </div>
