@@ -404,7 +404,7 @@ export const DashboardPage = ({
               </p>
               <button
                 onClick={onResetData}
-                className="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white rounded-lg text-xs font-semibold"
+                className="px-4 py-2 bg-rose-600 text-white rounded-lg text-xs font-semibold"
               >
                 Reset Prototype Data to Default
               </button>
