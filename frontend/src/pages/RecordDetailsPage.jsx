@@ -3,6 +3,7 @@ import { Icon } from '../components/Icon';
 import { ContentTypeBadge, RegionBadge, StatusBadge } from '../components/Badge';
 import { INITIAL_SCIENTISTS } from '../data/mockData';
 import { can, canAccessReview, PERMISSIONS } from '../auth/permissions';
+import { RecordChatbot } from '../components/RecordChatbot';
 
 export const RecordDetailsPage = ({
   record,
@@ -332,90 +333,10 @@ export const RecordDetailsPage = ({
           </div>
         </div>
 
-        {/* Right 1 Col: Related Items Sidebar (Knowledge Graph) matching Reference Screenshot */}
+        {/* Right 1 Col: Record-Specific AI Chatbot Assistant */}
         <div className="space-y-6">
-          {/* Related Items Box matching Reference UI */}
-          <div className="bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden">
-            <div className="p-4 bg-slate-50 border-b border-slate-200">
-              <h3 className="font-bold text-xs uppercase tracking-wider text-slate-800 flex items-center gap-1.5">
-                <Icon name="layers" size={14} className="text-blue-600" />
-                Related Items (Knowledge Graph)
-              </h3>
-              <p className="text-[11px] text-slate-500">Connected resources for this expedition</p>
-            </div>
-
-            <div className="divide-y divide-slate-100 text-xs">
-              {/* Datasets */}
-              <button
-                onClick={() => setActiveTab('dataset')}
-                className="w-full p-3.5 flex items-center justify-between hover:bg-slate-50 text-left transition-colors"
-              >
-                <div className="flex items-center gap-2.5">
-                  <div className="p-1.5 bg-blue-50 text-blue-600 rounded">
-                    <Icon name="database" size={15} />
-                  </div>
-                  <span className="font-semibold text-slate-800">Datasets ({record.linkedDatasetsCount || 2})</span>
-                </div>
-                <Icon name="chevron-right" size={14} className="text-slate-400" />
-              </button>
-
-              {/* Reports */}
-              <button
-                onClick={() => setActiveTab('reports')}
-                className="w-full p-3.5 flex items-center justify-between hover:bg-slate-50 text-left transition-colors"
-              >
-                <div className="flex items-center gap-2.5">
-                  <div className="p-1.5 bg-indigo-50 text-indigo-600 rounded">
-                    <Icon name="file-text" size={15} />
-                  </div>
-                  <span className="font-semibold text-slate-800">Reports ({record.linkedReportsCount || 1})</span>
-                </div>
-                <Icon name="chevron-right" size={14} className="text-slate-400" />
-              </button>
-
-              {/* Photos */}
-              <button
-                onClick={() => setActiveTab('photos')}
-                className="w-full p-3.5 flex items-center justify-between hover:bg-slate-50 text-left transition-colors"
-              >
-                <div className="flex items-center gap-2.5">
-                  <div className="p-1.5 bg-purple-50 text-purple-600 rounded">
-                    <Icon name="image" size={15} />
-                  </div>
-                  <span className="font-semibold text-slate-800">Photos ({record.linkedPhotosCount || 6})</span>
-                </div>
-                <Icon name="chevron-right" size={14} className="text-slate-400" />
-              </button>
-
-              {/* Videos */}
-              <button
-                onClick={() => setActiveTab('videos')}
-                className="w-full p-3.5 flex items-center justify-between hover:bg-slate-50 text-left transition-colors"
-              >
-                <div className="flex items-center gap-2.5">
-                  <div className="p-1.5 bg-rose-50 text-rose-600 rounded">
-                    <Icon name="video" size={15} />
-                  </div>
-                  <span className="font-semibold text-slate-800">Videos ({record.linkedVideosCount || 1})</span>
-                </div>
-                <Icon name="chevron-right" size={14} className="text-slate-400" />
-              </button>
-
-              {/* Scientists */}
-              <button
-                onClick={() => setActiveTab('scientists')}
-                className="w-full p-3.5 flex items-center justify-between hover:bg-slate-50 text-left transition-colors"
-              >
-                <div className="flex items-center gap-2.5">
-                  <div className="p-1.5 bg-emerald-50 text-emerald-600 rounded">
-                    <Icon name="users" size={15} />
-                  </div>
-                  <span className="font-semibold text-slate-800">Scientists ({record.linkedScientistsCount || 3})</span>
-                </div>
-                <Icon name="chevron-right" size={14} className="text-slate-400" />
-              </button>
-            </div>
-          </div>
+          {/* Interactive AI Chatbot Window for this Record */}
+          <RecordChatbot record={record} />
 
           {/* Related Discovery Recommendations */}
           <div className="bg-slate-50 rounded-xl border border-slate-200 p-4 space-y-3 text-xs">

@@ -899,13 +899,5 @@ export const DEMO_USERS = [
     role: "Admin",
     designation: "Knowledge System Administrator, NCPOR",
     avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=200&q=80"
-  },
-  {
-    id: "user-4",
-    name: "Aarav Gupta (Public / Student)",
-    email: "aarav.student@delhiuniv.ac.in",
-    role: "Public / Student",
-    designation: "Student / Teacher / Public Visitor (No Login Required)",
-    avatar: "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&w=200&q=80"
   }
 ];

@@ -15,7 +15,13 @@ export const SocialPreviewPage = ({
   const [likes, setLikes] = useState(124);
   const [isLiked, setIsLiked] = useState(false);
 
-  const captionData = record.aiDraft?.socialCaption || {
+  // Custom Generation State
+  const [platform, setPlatform] = useState('X (Twitter)');
+  const [idea, setIdea] = useState('');
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [customCaption, setCustomCaption] = useState(null);
+
+  const captionData = customCaption || record.aiDraft?.socialCaption || {
     hook: `❄️ Discoveries from ${record.location}!`,
     body: `${record.title}. Indian scientists under NCPOR continue pioneering research in polar frontiers.`,
     hashtags: ["#PolarScience", "#Antarctica", "#NCPOR", "#MoES", "#IndiaInAntarctica"],
@@ -28,6 +34,20 @@ export const SocialPreviewPage = ({
     navigator.clipboard.writeText(fullPostText);
     setCopied(true);
     setTimeout(() => setCopied(false), 2500);
+  };
+
+  const handleGenerate = () => {
+    if (!idea.trim()) return;
+    setIsGenerating(true);
+    setTimeout(() => {
+      setCustomCaption({
+        hook: `✨ AI Generated Draft for ${platform}`,
+        body: `${idea}\n\nHighlighting our work on: ${record.title}.`,
+        hashtags: ["#PolarScience", "#NCPOR", "#Outreach", `#${platform.split(' ')[0].replace(/[^a-zA-Z]/g, '')}`],
+        altText: captionData.altText
+      });
+      setIsGenerating(false);
+    }, 1500);
   };
 
   const handleDownloadImage = () => {
@@ -73,7 +93,7 @@ export const SocialPreviewPage = ({
         <Icon name="arrow-left" size={14} /> Back to Search / Records
       </button>
 
-      {/* Header matching Reference UI */}
+      {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2">
@@ -86,31 +106,80 @@ export const SocialPreviewPage = ({
             Social Media Post
           </h1>
         </div>
-
-        {/* Quick Record Switcher */}
-        <div className="flex items-center gap-2">
-          <label className="text-xs text-slate-500 font-medium">Record:</label>
-          <select
-            value={record.id}
-            onChange={(e) => {
-              const target = allRecords.find(r => r.id === e.target.value);
-              if (target) onSelectRecord(target);
-            }}
-            className="text-xs p-2 bg-white border border-slate-300 rounded-lg text-slate-800 focus:outline-none"
-          >
-            {publishedRecords.map(r => (
-              <option key={r.id} value={r.id}>
-                {r.title.slice(0, 38)}...
-              </option>
-            ))}
-          </select>
-        </div>
       </div>
 
-      {/* Main Grid: Left Social Mock Post + Right Share/Export Tools matching Reference UI */}
+      {/* Main Grid: Generator Form & Post Preview (left 2 cols) + Share Panel (right 1 col) */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
-        {/* Left 2 Cols: Authentic Social Media Post Card */}
-        <div className="lg:col-span-2 space-y-4">
+        {/* Left 2 Cols: AI Generator Panel + Sample Post Preview */}
+        <div className="lg:col-span-2 space-y-6">
+          {/* AI Generator Panel */}
+          <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl border border-blue-100 shadow-sm p-6 space-y-4">
+            <h3 className="font-bold text-sm text-blue-900 flex items-center gap-2">
+              AI Draft Generator
+            </h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-xs font-semibold text-slate-700 mb-1.5">Social Platform</label>
+                <select
+                  value={platform}
+                  onChange={(e) => setPlatform(e.target.value)}
+                  className="w-full text-sm p-2 bg-white border border-slate-300 rounded-lg text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                >
+                  <option value="X (Twitter)">X (Twitter)</option>
+                  <option value="LinkedIn">LinkedIn</option>
+                  <option value="Facebook">Facebook</option>
+                  <option value="Instagram">Instagram</option>
+                </select>
+              </div>
+              <div className="flex items-center gap-2">
+                <label className="text-xs text-slate-500 font-medium">Record:</label>
+                <select
+                  value={record.id}
+                  onChange={(e) => {
+                    const target = allRecords.find(r => r.id === e.target.value);
+                    if (target) onSelectRecord(target);
+                  }}
+                  className="text-xs p-2 bg-white border border-slate-300 rounded-lg text-slate-800 focus:outline-none"
+                >
+                  {publishedRecords.map(r => (
+                    <option key={r.id} value={r.id}>
+                      {r.title.slice(0, 38)}...
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+            <div>
+              <label className="block text-xs font-semibold text-slate-700 mb-1.5">What's the idea for the post?</label>
+              <textarea
+                value={idea}
+                onChange={(e) => setIdea(e.target.value)}
+                placeholder="E.g., Highlight the challenging weather conditions during this expedition..."
+                className="w-full text-sm p-3 bg-white border border-slate-300 rounded-lg text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20 resize-none h-20"
+              />
+            </div>
+            <div className="flex justify-end">
+              <button
+                onClick={handleGenerate}
+                disabled={isGenerating || !idea.trim()}
+                className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold text-white shadow-sm transition-all ${isGenerating || !idea.trim() ? 'bg-blue-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'}`}
+              >
+                {isGenerating ? (
+                  <>
+                    <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+                    Generating...
+                  </>
+                ) : (
+                  <>
+                    <Icon name="pen-tool" size={16} />
+                    Generate Post
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+
+          {/* Sample Post Preview (beneath form) */}
           <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 space-y-4">
             {/* Account Header */}
             <div className="flex items-center justify-between">
@@ -146,7 +215,7 @@ export const SocialPreviewPage = ({
               </div>
             </div>
 
-            {/* Image Preview Box matching Reference UI */}
+            {/* Image Preview */}
             <div className="rounded-xl overflow-hidden border border-slate-200 bg-slate-100 max-h-96">
               <img
                 src={record.thumbnail}
@@ -161,12 +230,11 @@ export const SocialPreviewPage = ({
               <span className="truncate">{captionData.altText}</span>
             </div>
 
-            {/* Mock Social Interactions matching Reference UI */}
+            {/* Mock Social Interactions */}
             <div className="pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
               <button
                 onClick={handleLikeToggle}
-                className={`flex items-center gap-1.5 transition-colors ${isLiked ? 'text-rose-600 font-bold' : 'hover:text-rose-600'
-                  }`}
+                className={`flex items-center gap-1.5 transition-colors ${isLiked ? 'text-rose-600 font-bold' : 'hover:text-rose-600'}`}
               >
                 <Icon name="heart" size={16} />
                 <span>{likes}</span>
@@ -193,8 +261,8 @@ export const SocialPreviewPage = ({
           </div>
         </div>
 
-        {/* Right 1 Col: Download / Share Panel matching Reference Screenshot */}
-        <div className="space-y-4">
+        {/* Right 1 Col: Download / Share Panel */}
+        <div className="space-y-4 lg:sticky lg:top-6">
           <div className="bg-white rounded-xl border border-slate-200 shadow-xs p-5 space-y-4">
             <h3 className="font-bold text-xs uppercase tracking-wider text-slate-800 flex items-center gap-1.5">
               <Icon name="share" size={15} className="text-purple-600" />
@@ -251,9 +319,8 @@ export const SocialPreviewPage = ({
 
             {/* Human Verification Seal */}
             <div className="pt-3 border-t border-slate-100 flex items-start gap-2.5 text-[11px] text-slate-500">
-
               <p>
-                <strong>Reviewed by:</strong>  {record.aiDraft?.reviewedBy || 'NCPOR Scientific Reviewer'}.
+                <strong>Reviewed by:</strong> {record.aiDraft?.reviewedBy || 'NCPOR Scientific Reviewer'}.
               </p>
             </div>
             <button

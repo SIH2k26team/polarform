@@ -36,24 +36,128 @@ import {
   PERMISSIONS
 } from './auth/permissions';
 
+// ── Route Helpers ─────────────────────────────────────────────────────────────
+const getRouteFromPath = (pathname, searchStr = '') => {
+  const cleanPath = pathname.replace(/\/$/, '') || '/';
+  const searchParams = new URLSearchParams(searchStr);
+  const query = searchParams.get('query') || '';
+  const recordId = searchParams.get('id') || '';
+
+  if (cleanPath === '/' || cleanPath === '/home') {
+    return { page: 'home', params: {} };
+  }
+  if (cleanPath === '/explore') {
+    return { page: 'explore', params: { query } };
+  }
+  if (cleanPath.startsWith('/record/')) {
+    const id = cleanPath.replace('/record/', '');
+    return { page: 'record-details', params: { recordId: id } };
+  }
+  if (cleanPath === '/record') {
+    return { page: 'record-details', params: { recordId } };
+  }
+  if (cleanPath.startsWith('/student-explainer/')) {
+    const id = cleanPath.replace('/student-explainer/', '');
+    return { page: 'student-view', params: { recordId: id } };
+  }
+  if (cleanPath === '/student-view' || cleanPath === '/student-explainer') {
+    return { page: 'student-view', params: { recordId } };
+  }
+  if (cleanPath === '/upload') {
+    return { page: 'upload', params: {} };
+  }
+  if (cleanPath === '/ai-review' || cleanPath === '/review') {
+    return { page: 'ai-review', params: { recordId } };
+  }
+  if (cleanPath === '/outreach') {
+    return { page: 'outreach', params: { recordId } };
+  }
+  if (cleanPath === '/dashboard') {
+    return { page: 'dashboard', params: {} };
+  }
+  if (cleanPath === '/login') {
+    return { page: 'login', params: {} };
+  }
+  if (cleanPath === '/about') {
+    return { page: 'about', params: {} };
+  }
+  if (cleanPath === '/access-denied') {
+    return { page: 'access-denied', params: {} };
+  }
+  return { page: 'home', params: {} };
+};
+
+const getPathFromRoute = (pageId, params = {}) => {
+  switch (pageId) {
+    case 'home':
+      return '/';
+    case 'explore':
+      return params.query ? `/explore?query=${encodeURIComponent(params.query)}` : '/explore';
+    case 'record-details':
+      return params.recordId ? `/record/${params.recordId}` : '/record';
+    case 'student-view':
+      return params.recordId ? `/student-explainer/${params.recordId}` : '/student-explainer';
+    case 'upload':
+      return '/upload';
+    case 'ai-review':
+      return params.recordId ? `/ai-review?id=${params.recordId}` : '/ai-review';
+    case 'outreach':
+      return params.recordId ? `/outreach?id=${params.recordId}` : '/outreach';
+    case 'dashboard':
+      return '/dashboard';
+    case 'login':
+      return '/login';
+    case 'about':
+      return '/about';
+    case 'access-denied':
+      return '/access-denied';
+    default:
+      return '/';
+  }
+};
+
 export default function App() {
   const [records, setRecords] = useState([]);
   const [auditLogs, setAuditLogs] = useState([]);
   const [currentUser, setUserState] = useState(getCurrentUser());
-  const [activePage, setActivePage] = useState('home');
-  const [pageParams, setPageParams] = useState({});
+  const initialRoute = getRouteFromPath(window.location.pathname, window.location.search);
+  const [activePage, setActivePage] = useState(initialRoute.page);
+  const [pageParams, setPageParams] = useState(initialRoute.params);
   const [selectedRecord, setSelectedRecord] = useState(null);
   const [toast, setToast] = useState(null);
 
-  // Initialize data on mount
+  // Initialize data & routes on mount and sync with browser history
   useEffect(() => {
     const loadedRecords = getStoredRecords();
     const loadedLogs = getStoredAuditLogs();
     setRecords(loadedRecords);
     setAuditLogs(loadedLogs);
-    if (loadedRecords.length > 0) {
+
+    const currentRoute = getRouteFromPath(window.location.pathname, window.location.search);
+    setActivePage(currentRoute.page);
+    setPageParams(currentRoute.params);
+
+    if (currentRoute.params.recordId && loadedRecords.length > 0) {
+      const found = loadedRecords.find(r => r.id === currentRoute.params.recordId);
+      if (found) setSelectedRecord(found);
+      else setSelectedRecord(loadedRecords[0]);
+    } else if (loadedRecords.length > 0) {
       setSelectedRecord(loadedRecords[0]);
     }
+
+    const handlePopState = () => {
+      const popRoute = getRouteFromPath(window.location.pathname, window.location.search);
+      setActivePage(popRoute.page);
+      setPageParams(popRoute.params);
+      if (popRoute.params.recordId) {
+        const recs = getStoredRecords();
+        const found = recs.find(r => r.id === popRoute.params.recordId);
+        if (found) setSelectedRecord(found);
+      }
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
   }, []);
 
   const showToast = (message, type = 'success', title = '') => {
@@ -61,17 +165,33 @@ export default function App() {
     setTimeout(() => setToast(null), 4000);
   };
 
-  // ── Guarded navigation ────────────────────────────────────────────────────
+  // ── Guarded navigation with URL updates ───────────────────────────────────
   const handleNavigate = (pageId, params = {}) => {
     // Check access before routing
     if (!canAccessPage(currentUser, pageId)) {
       setActivePage('access-denied');
       setPageParams({ attempted: pageId });
+      window.history.pushState({}, '', '/access-denied');
       window.scrollTo({ top: 0, behavior: 'smooth' });
       return;
     }
+
+    let mergedParams = { ...params };
+    if (
+      (pageId === 'record-details' || pageId === 'student-view' || pageId === 'ai-review' || pageId === 'outreach') &&
+      !mergedParams.recordId &&
+      selectedRecord
+    ) {
+      mergedParams.recordId = selectedRecord.id;
+    }
+
+    const newUrl = getPathFromRoute(pageId, mergedParams);
+    if (window.location.pathname + window.location.search !== newUrl) {
+      window.history.pushState({}, '', newUrl);
+    }
+
     setActivePage(pageId);
-    setPageParams(params);
+    setPageParams(mergedParams);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -82,13 +202,15 @@ export default function App() {
   };
 
   const handleSelectRecord = (record) => {
-    setSelectedRecord(record);
-    handleNavigate('record-details');
+    const target = record || selectedRecord || records[0];
+    if (target) setSelectedRecord(target);
+    handleNavigate('record-details', { recordId: target?.id });
   };
 
   const handleOpenStudentView = (record) => {
-    setSelectedRecord(record || records[0]);
-    handleNavigate('student-view');
+    const target = record || selectedRecord || records[0];
+    if (target) setSelectedRecord(target);
+    handleNavigate('student-view', { recordId: target?.id });
   };
 
   const handleOpenOutreach = (record) => {
@@ -96,8 +218,9 @@ export default function App() {
       showToast('Outreach Studio requires Reviewer or Admin access.', 'error', 'Access Denied');
       return;
     }
-    setSelectedRecord(record || records[0]);
-    handleNavigate('outreach');
+    const target = record || selectedRecord || records[0];
+    if (target) setSelectedRecord(target);
+    handleNavigate('outreach', { recordId: target?.id });
   };
 
   const handleOpenReview = (record) => {
@@ -105,25 +228,23 @@ export default function App() {
       showToast('The Review Gate requires Researcher, Reviewer, or Admin access.', 'error', 'Access Denied');
       return;
     }
-    if (record) {
-      if (isResearcher(currentUser) && !isAuthor(currentUser, record)) {
+    let target = record;
+    if (target) {
+      if (isResearcher(currentUser) && !isAuthor(currentUser, target)) {
         showToast('Researchers can inspect and edit AI drafts for their own submissions.', 'info', 'Showing Your Submission');
         const ownRec = records.find(r => isAuthor(currentUser, r));
-        if (ownRec) setSelectedRecord(ownRec);
-      } else {
-        setSelectedRecord(record);
+        if (ownRec) target = ownRec;
       }
     } else {
       if (isResearcher(currentUser)) {
-        const ownPending = records.find(r => isAuthor(currentUser, r) && (r.status === 'Under Review' || r.status === 'Changes Requested'))
+        target = records.find(r => isAuthor(currentUser, r) && (r.status === 'Under Review' || r.status === 'Changes Requested'))
           || records.find(r => isAuthor(currentUser, r));
-        if (ownPending) setSelectedRecord(ownPending);
       } else {
-        const pending = records.find(r => r.status === 'Under Review') || records[0];
-        if (pending) setSelectedRecord(pending);
+        target = records.find(r => r.status === 'Under Review') || records[0];
       }
     }
-    handleNavigate('ai-review');
+    if (target) setSelectedRecord(target);
+    handleNavigate('ai-review', { recordId: target?.id });
   };
 
   // ── Upload / Create ───────────────────────────────────────────────────────

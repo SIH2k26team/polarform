@@ -24,8 +24,6 @@ export const LoginPage = ({
   };
 
   const handlePublicAccess = () => {
-    const publicUser = DEMO_USERS.find(u => u.role === 'Public / Student') || DEMO_USERS[3];
-    onLoginSuccess(publicUser);
     onNavigate('explore');
   };
 
