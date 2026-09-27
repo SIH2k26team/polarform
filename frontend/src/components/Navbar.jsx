@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Icon } from './Icon';
 import { RoleBadge } from './AccessDenied';
 import { DEMO_USERS } from '../data/mockData';
-import { can, PERMISSIONS, ROLES } from '../auth/permissions';
+import { can, PERMISSIONS, ROLES, isReviewer } from '../auth/permissions';
 
 export const Navbar = ({
   activePage,
@@ -71,7 +71,9 @@ export const Navbar = ({
   const navLinks = !isLoggedIn
     ? allLinks.filter(link => ['home', 'explore', 'about'].includes(link.id))
     : allLinks.filter(link =>
-      link.id !== 'about' && (link.permission === null || can(currentUser, link.permission))
+      link.id !== 'about' &&
+      !(link.id === 'upload' && isReviewer(currentUser)) &&
+      (link.permission === null || can(currentUser, link.permission))
     );
 
   return (
