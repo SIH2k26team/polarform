@@ -298,15 +298,19 @@ export default function App() {
         )                                           // researcher sees published + own records
       : records.filter(r => r.status === 'Published'); // public sees published only
 
+  const isLoginPage = activePage === 'login';
+
   return (
     <div className="min-h-screen flex flex-col bg-slate-50 text-slate-800 antialiased selection:bg-blue-100 selection:text-blue-900">
-      <Navbar
-        activePage={activePage}
-        onNavigate={handleNavigate}
-        currentUser={currentUser}
-        onSwitchUser={handleSwitchUser}
-        pendingReviewCount={pendingReviewCount}
-      />
+      {!isLoginPage && (
+        <Navbar
+          activePage={activePage}
+          onNavigate={handleNavigate}
+          currentUser={currentUser}
+          onSwitchUser={handleSwitchUser}
+          pendingReviewCount={pendingReviewCount}
+        />
+      )}
 
       <main className="flex-1">
         {/* ── Access Denied Wall ── */}
@@ -447,7 +451,7 @@ export default function App() {
         )}
       </main>
 
-      <Footer onNavigate={handleNavigate} />
+      {!isLoginPage && <Footer onNavigate={handleNavigate} />}
       <NotificationToast toast={toast} onClose={() => setToast(null)} />
     </div>
   );

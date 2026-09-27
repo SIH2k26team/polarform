@@ -77,17 +77,14 @@ export const SocialPreviewPage = ({
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2">
-            <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 bg-purple-100 text-purple-800 rounded">
+            <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 text-purple-800 rounded">
               Outreach Studio
             </span>
             <RegionBadge region={record.region} />
           </div>
           <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 mt-1">
-            Social Media Post Preview
+            Social Media Post
           </h1>
-          <p className="text-xs sm:text-sm text-slate-500 mt-1">
-            Turn verified scientific research into accessible, engaging outreach posts.
-          </p>
         </div>
 
         {/* Quick Record Switcher */}
@@ -219,8 +216,8 @@ export const SocialPreviewPage = ({
               <button
                 onClick={handleCopyText}
                 className={`w-full py-2.5 px-4 rounded-lg text-xs font-semibold transition-colors flex items-center justify-center gap-2 border ${copied
-                    ? 'bg-emerald-50 text-emerald-700 border-emerald-300'
-                    : 'bg-white hover:bg-slate-50 text-slate-800 border-slate-300'
+                  ? 'bg-emerald-50 text-emerald-700 border-emerald-300'
+                  : 'bg-white hover:bg-slate-50 text-slate-800 border-slate-300'
                   }`}
               >
                 <Icon name={copied ? 'check' : 'copy'} size={15} />
@@ -254,24 +251,16 @@ export const SocialPreviewPage = ({
 
             {/* Human Verification Seal */}
             <div className="pt-3 border-t border-slate-100 flex items-start gap-2.5 text-[11px] text-slate-500">
-              <div className="p-1 rounded-full bg-emerald-100 text-emerald-700 shrink-0">
-                <Icon name="shield-check" size={13} />
-              </div>
+
               <p>
-                <strong>Human Checked:</strong> Reviewed by {record.aiDraft?.reviewedBy || 'NCPOR Scientific Reviewer'}.
+                <strong>Reviewed by:</strong>  {record.aiDraft?.reviewedBy || 'NCPOR Scientific Reviewer'}.
               </p>
             </div>
-          </div>
-
-          {/* Link back to original record */}
-          <div className="bg-slate-50 rounded-xl border border-slate-200 p-4 text-xs space-y-2">
-            <span className="font-bold text-slate-800 block">Source Record</span>
-            <p className="text-slate-600 text-[11px] truncate">{record.title}</p>
             <button
               onClick={() => onOpenRecordDetails(record)}
-              className="text-blue-600 hover:text-blue-800 font-semibold flex items-center gap-1 text-xs"
+              className="text-blue-600 font-semibold flex items-center gap-1 text-xs"
             >
-              View Full Scientific Record <Icon name="chevron-right" size={12} />
+              Source Record
             </button>
           </div>
         </div>
