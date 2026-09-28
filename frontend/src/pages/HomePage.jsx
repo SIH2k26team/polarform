@@ -82,13 +82,13 @@ export const HomePage = ({
         </div>
       </section>
 
-      {/* 3 Core Action Cards matching Reference UI */}
+      {/* Core Action Cards matching Reference UI */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 -mt-8 relative z-10">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Card 1: Discover */}
           <div
             onClick={() => onNavigate('explore')}
-            className="bg-white p-6 rounded-xl border border-slate-200 transition-all cursor-pointer group flex items-start gap-4"
+            className="bg-white p-6 rounded-xl border border-slate-200 transition-all cursor-pointer group flex items-start gap-4 shadow-sm hover:shadow-md"
           >
             <div className="w-12 h-12 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
               <Icon name="search" size={24} />
@@ -112,9 +112,9 @@ export const HomePage = ({
               const explainerRec = records.find(r => r.id === 'rec-001') || publishedRecords[0];
               onOpenStudentView(explainerRec);
             }}
-            className="bg-white p-6 rounded-xl border border-slate-200 transition-all cursor-pointer group flex items-start gap-4"
+            className="bg-white p-6 rounded-xl border border-slate-200 transition-all cursor-pointer group flex items-start gap-4 shadow-sm hover:shadow-md"
           >
-            <div className="w-12 h-12 rounded-xl bg-teal-50 text-teal-600 flex items-center justify-center shrink-0  transition-colors">
+            <div className="w-12 h-12 rounded-xl bg-teal-50 text-teal-600 flex items-center justify-center shrink-0 transition-colors">
               <Icon name="book-open" size={24} />
             </div>
             <div>
@@ -129,48 +129,6 @@ export const HomePage = ({
               </div>
             </div>
           </div>
-
-          {/* Card 3: Share — Reviewer+ only; Login CTA for public */}
-          {can(currentUser, PERMISSIONS.VIEW_OUTREACH) ? (
-            <div
-              onClick={() => {
-                const shareRec = records.find(r => r.id === 'rec-003') || records.filter(r => r.status === 'Published')[0];
-                onOpenOutreach(shareRec);
-              }}
-              className="bg-white p-6 rounded-xl border border-slate-200 transition-all cursor-pointer group flex items-start gap-4"
-            >
-              <div className="w-12 h-12 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center shrink-0 transition-colors">
-                <Icon name="share" size={24} />
-              </div>
-              <div>
-                <h3 className="font-bold text-slate-900 text-base mb-1 transition-colors">Share</h3>
-                <p className="text-slate-600 text-xs leading-relaxed">
-                  Turn verified polar science into ready-to-use social captions, media packs, and web articles.
-                </p>
-                <div className="mt-3 inline-flex items-center text-xs font-semibold text-purple-600 group-hover:underline gap-1">
-                  Open Outreach Studio <Icon name="chevron-right" size={14} />
-                </div>
-              </div>
-            </div>
-          ) : (
-            <div
-              onClick={() => onNavigate('login')}
-              className="bg-white p-6 rounded-xl border border-dashed border-slate-300 transition-all cursor-pointer group flex items-start gap-4 opacity-80 hover:opacity-100"
-            >
-              <div className="w-12 h-12 rounded-xl bg-slate-100 text-slate-400 flex items-center justify-center shrink-0">
-                <Icon name="shield-check" size={24} />
-              </div>
-              <div>
-                <h3 className="font-bold text-slate-700 text-base mb-1">Outreach Studio</h3>
-                <p className="text-slate-500 text-xs leading-relaxed">
-                  Requires Reviewer access. Log in with a Reviewer or Admin account to generate social media packs.
-                </p>
-                <div className="mt-3 inline-flex items-center text-xs font-semibold text-blue-600 group-hover:underline gap-1">
-                  Login to Access <Icon name="chevron-right" size={14} />
-                </div>
-              </div>
-            </div>
-          )}
         </div>
       </section>
 

@@ -53,10 +53,22 @@ export const StudentExplainerPage = ({
       "Over 1.3 billion people depend on freshwater originating from Himalayan glacial meltwater."
     ]
   }[record.region] || [
-    "Polar regions act as Earth's natural air conditioners.",
-    "Data collected by Indian scientists is shared with international polar research databases.",
-    "Satellite telemetry links Indian polar stations in real-time with NCPOR headquarters in Goa."
-  ];
+      "Polar regions act as Earth's natural air conditioners.",
+      "Data collected by Indian scientists is shared with international polar research databases.",
+      "Satellite telemetry links Indian polar stations in real-time with NCPOR headquarters in Goa."
+    ];
+
+  // Region-based easy explanation details
+  const coreConcept = explainer.intro || record.description || "Polar scientists explore extreme freezing environments to collect ice, water, and atmospheric samples.";
+
+  const whyItMattersText = {
+    Antarctica: "Antarctica stores 70% of world freshwater. Understanding its ice melt helps predict sea level rise across coastal India and worldwide.",
+    Arctic: "Changes in Arctic sea ice and winds directly influence the Indian Summer Monsoon and regional weather patterns.",
+    Himalayas: "Glaciers in the Himalayas (The Third Pole) feed India's major rivers like the Ganges, Indus, and Brahmaputra, providing drinking water for 1.3+ billion people.",
+    'Southern Ocean': "The Southern Ocean acts as Earth's natural carbon sponge, soaking up heat and CO2 from the atmosphere."
+  }[record.region] || "Polar research helps predict global climate patterns, sea levels, and weather changes.";
+
+  const easyTakeaway = explainer.keyTakeaways?.[0] || "Field measurements and satellite data allow scientists to trace climate history and safeguard our environment.";
 
   const handleCopyLink = () => {
     navigator.clipboard.writeText(window.location.href);
@@ -76,7 +88,7 @@ export const StudentExplainerPage = ({
       {/* Header */}
       <div>
         <div className="flex items-center gap-2">
-          <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 bg-teal-100 text-teal-800 rounded">
+          <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 text-teal-800 rounded">
             Student & Public View
           </span>
           <RegionBadge region={record.region} />
@@ -93,23 +105,84 @@ export const StudentExplainerPage = ({
       {/* Hero Visual Card */}
       <div className="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-xs">
         <div className="grid grid-cols-1 md:grid-cols-2">
-          <div className="h-64 md:h-auto bg-slate-100 relative">
+          {/* Left Column: Expedition Photo */}
+          <div className="h-64 md:h-auto bg-slate-100 relative min-h-[300px]">
             <img
               src={record.thumbnail}
               alt={explainer.title}
               className="w-full h-full object-cover"
             />
+            <div className="absolute top-3 left-3 bg-slate-900/80 backdrop-blur-xs text-white text-[10px] font-bold px-2.5 py-1 rounded-full flex items-center gap-1.5 shadow-sm">
+              <Icon name="photo" size={12} /> Expedition Field Visual
+            </div>
           </div>
-          <div className="p-6 md:p-8 flex flex-col justify-center space-y-4">
-            <h2 className="text-xl sm:text-2xl font-bold text-slate-900 leading-tight">
-              {explainer.title}
-            </h2>
-            <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
-              {explainer.intro}
-            </p>
-            <div className="pt-2 text-xs text-slate-400 flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
-              <span>Checked for accuracy by NCPOR scientific reviewers</span>
+
+          {/* Right Column: Detailed Explanation Content */}
+          <div className="p-6 md:p-7 flex flex-col justify-between space-y-4 bg-slate-50/40">
+            <div className="space-y-3">
+              {/* Header Badges */}
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="inline-flex items-center gap-1 text-[11px] font-bold text-teal-800 px-2.5 py-0.5 rounded-full">
+                  <Icon name="sparkles" size={12} /> Student Explainer
+                </span>
+                <span className="text-[10px] font-semibold text-slate-500 bg-slate-200/70 px-2 py-0.5 rounded-full">
+                  Easy Reading • 3 min
+                </span>
+              </div>
+
+              {/* Title */}
+              <h2 className="text-xl sm:text-2xl font-bold text-slate-900 leading-tight">
+                {explainer.title}
+              </h2>
+
+              {/* Intro explanation */}
+              <p className="text-xs sm:text-sm text-slate-700 leading-relaxed">
+                {explainer.intro}
+              </p>
+
+              {/* In Easy & Simple Words Highlight Box */}
+              <div className="bg-gradient-to-br from-blue-50/90 to-teal-50/90 border border-blue-200/70 rounded-xl p-4 space-y-2.5 shadow-2xs">
+                <div className="flex items-center gap-1.5 text-blue-950 font-bold text-xs">
+                  <Icon name="lightbulb" size={16} className="text-amber-500 shrink-0" />
+                  <span>In Easy & Simple Words:</span>
+                </div>
+
+                <div className="text-[11px] sm:text-xs text-slate-700 space-y-2 leading-relaxed">
+                  <div className="flex items-start gap-1.5">
+                    <span className="font-bold text-teal-800 shrink-0">🔬 What is this study?</span>
+                    <span>{coreConcept}</span>
+                  </div>
+
+                  <div className="flex items-start gap-1.5">
+                    <span className="font-bold text-blue-800 shrink-0">🌍 Why it matters to us:</span>
+                    <span>{whyItMattersText}</span>
+                  </div>
+
+                  <div className="flex items-start gap-1.5">
+                    <span className="font-bold text-indigo-800 shrink-0">💡 Quick Takeaway:</span>
+                    <span>{easyTakeaway}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Bottom Metadata & Accuracy Check */}
+            <div className="pt-2 border-t border-slate-200/80 space-y-2">
+              <div className="flex flex-wrap items-center justify-between gap-2 text-[11px] text-slate-600">
+                <span className="flex items-center gap-1 font-medium">
+                  <Icon name="map-pin" size={12} className="text-rose-500" />
+                  <span className="text-slate-800 font-semibold">{record.location || record.region}</span>
+                </span>
+                <span className="flex items-center gap-1">
+                  <Icon name="user" size={12} className="text-blue-500" />
+                  <span>{record.authorName || 'NCPOR Scientist'}</span>
+                </span>
+              </div>
+
+              <div className="text-[11px] text-emerald-800 border border-emerald-200 px-2.5 py-1 rounded-lg flex items-center gap-1.5 font-medium">
+                <Icon name="check-circle" size={13} className="text-emerald-600 shrink-0" />
+                <span>Reviewed & verified for accuracy by NCPOR scientific team</span>
+              </div>
             </div>
           </div>
         </div>
@@ -178,33 +251,8 @@ export const StudentExplainerPage = ({
           )}
 
 
-
-          {/* Expedition Journey Timeline */}
-          <div className="space-y-3 pt-4 border-t border-slate-100">
-            <h4 className="font-bold text-sm text-slate-900 flex items-center gap-1.5">
-              <Icon name="clock" size={16} className="text-indigo-600" />
-              From Field Expedition to Verified Discovery
-            </h4>
-            <div className="grid grid-cols-1 sm:grid-cols-4 gap-3 text-xs">
-              <div className="p-3 bg-slate-50 rounded-lg border border-slate-200">
-                <span className="font-bold text-slate-800 block">1. Field Sampling</span>
-                <p className="text-[11px] text-slate-500 mt-1">Collected at {record.location}</p>
-              </div>
-              <div className="p-3 bg-slate-50 rounded-lg border border-slate-200">
-                <span className="font-bold text-slate-800 block">2. Lab Analysis</span>
-                <p className="text-[11px] text-slate-500 mt-1">Processed at NCPOR Goa facility</p>
-              </div>
-              <div className="p-3 bg-slate-50 rounded-lg border border-slate-200">
-                <span className="font-bold text-slate-800 block">3. Peer Review</span>
-                <p className="text-[11px] text-slate-500 mt-1">Human reviewed and fact-checked</p>
-              </div>
-              <div className="p-3 bg-emerald-50 rounded-lg border border-emerald-200">
-                <span className="font-bold text-emerald-800 block">4. Public Explainer</span>
-                <p className="text-[11px] text-emerald-700 mt-1">Shared for Indian students</p>
-              </div>
-            </div>
-          </div>
         </div>
+
 
         {/* Bottom Actions */}
         <div className="p-4 bg-slate-50 border-t border-slate-200 flex flex-wrap items-center justify-between gap-3">
@@ -222,12 +270,7 @@ export const StudentExplainerPage = ({
             >
               <Icon name="copy" size={13} /> Copy Link
             </button>
-            <button
-              onClick={() => onOpenOutreach(record)}
-              className="px-3.5 py-1.5 bg-purple-600 hover:bg-purple-700 text-white rounded-lg text-xs font-semibold transition-colors flex items-center gap-1"
-            >
-              <Icon name="share" size={13} /> Outreach Pack
-            </button>
+
           </div>
         </div>
       </div>

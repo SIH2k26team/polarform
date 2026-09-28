@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Icon } from './Icon';
 import { RoleBadge } from './AccessDenied';
 import { DEMO_USERS } from '../data/mockData';
-import { can, PERMISSIONS, ROLES, isReviewer } from '../auth/permissions';
+import { can, PERMISSIONS, ROLES, isReviewer, isResearcher } from '../auth/permissions';
 
 export const Navbar = ({
   activePage,
@@ -73,6 +73,7 @@ export const Navbar = ({
     : allLinks.filter(link =>
       link.id !== 'about' &&
       !(link.id === 'upload' && isReviewer(currentUser)) &&
+      !(link.id === 'ai-review' && isResearcher(currentUser)) &&
       (link.permission === null || can(currentUser, link.permission))
     );
 

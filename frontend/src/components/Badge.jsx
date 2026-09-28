@@ -18,8 +18,7 @@ export const StatusBadge = ({ status, className = "" }) => {
       );
     case 'Changes Requested':
       return (
-        <span className={`inline-flex items-center py-0.5 rounded-full text-xs font-medium text-rose-700 ${className}`}>
-          <span className="w-1.5 h-1.5 rounded-full "></span>
+        <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium text-rose-700 ${className}`}>
           Changes Requested
         </span>
       );
@@ -27,7 +26,6 @@ export const StatusBadge = ({ status, className = "" }) => {
     default:
       return (
         <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-700 border border-slate-200 ${className}`}>
-          <span className="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
           Draft (AI-Suggested)
         </span>
       );
